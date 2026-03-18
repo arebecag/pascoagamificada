@@ -244,11 +244,12 @@ body {
 /* VISÃO GERAL */
 #visao-geral.active {
   position: relative;
-  display: grid;
-  grid-template-rows: 84px auto 1fr auto;
+  display: flex;
+  flex-direction: column;
   gap: 0.85rem;
-  overflow: hidden;
+  overflow: auto;
   padding-top: 0.1rem;
+  padding-right: 4px;
 }
 
 /* COELHO TOPO */
@@ -1060,8 +1061,6 @@ body {
   }
 
   #visao-geral.active {
-    grid-template-rows: auto auto auto auto;
-    overflow: auto;
     padding-right: 2px;
   }
 
