@@ -97,36 +97,36 @@
           <div class="kpi-card kpi-purple">
             <div class="kpi-icon"><i class="fas fa-users"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Clientes na Campanha</span>
+              <span class="kpi-label">Clientes participantes</span>
               <span class="kpi-value" data-count="4162">0</span>
-              <span class="kpi-sub">status Dentro</span>
+              <span class="kpi-sub">compraram pelo app</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-green">
-            <div class="kpi-icon"><i class="fas fa-receipt"></i></div>
+            <div class="kpi-icon"><i class="fas fa-user-xmark"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Cupons na Campanha</span>
-              <span class="kpi-value" data-count="4489">0</span>
-              <span class="kpi-sub">tickets da campanha</span>
+              <span class="kpi-label">Clientes não participantes</span>
+              <span class="kpi-value" data-count="33509">0</span>
+              <span class="kpi-sub">não compraram pelo app</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-orange">
-            <div class="kpi-icon"><i class="fas fa-box"></i></div>
+            <div class="kpi-icon"><i class="fas fa-cart-shopping"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Qtd Vendida</span>
+              <span class="kpi-label">Vendas app</span>
               <span class="kpi-value" data-count="6616">0</span>
-              <span class="kpi-sub">itens da campanha</span>
+              <span class="kpi-sub">itens vendidos pelo app</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-pink">
             <div class="kpi-icon"><i class="fas fa-store"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Lojas Participantes</span>
+              <span class="kpi-label">Lojas com vendas app</span>
               <span class="kpi-value" data-count="67">0</span>
-              <span class="kpi-sub">filiais com vendas</span>
+              <span class="kpi-sub">filiais participantes</span>
             </div>
           </div>
         </div>
@@ -135,7 +135,7 @@
           <div class="chart-card chart-card-wide">
            <div class="chart-header">
   <h3><i class="fas fa-chart-line"></i> Evolução Diária — Campanha</h3>
-  <p class="chart-sub">Comparativo diário de 01/03 a 17/03 — Dentro vs Fora</p>
+  <p class="chart-sub">Comparativo diário de 01/03 a 17/03 — Compraram vs Compraram pelo app</p>
 </div>
 
             <div class="chart-body" style="height:260px">
@@ -145,27 +145,38 @@
 
           <div class="chart-card chart-card-narrow">
             <div class="chart-header">
-              <h3><i class="fas fa-circle-half-stroke"></i> Base da Campanha</h3>
-              <p class="chart-sub">Dentro vs Fora</p>
+              <h3><i class="fas fa-circle-half-stroke"></i> Participação na base</h3>
+              <p class="chart-sub">Clientes participantes vs não participantes</p>
             </div>
             <div class="chart-body chart-center-body" style="height:200px">
               <canvas id="chartDonutClientes"></canvas>
             </div>
             <div class="donut-legend">
-              <span class="dot dot-purple"></span><span>Dentro <strong>4.162</strong></span>
-              <span class="dot dot-cream"></span><span>Fora <strong>33.509</strong></span>
+              <span class="dot dot-purple"></span><span>Clientes participantes <strong>4.162</strong></span>
+              <span class="dot dot-cream"></span><span>Clientes não participantes <strong>33.509</strong></span>
             </div>
           </div>
         </div>
 
-        <div class="podio-section">
-          <div class="section-title-bar">
-            <img src="assets/img/badge-maior-pascoa.png" alt="" class="title-badge" />
-            <h2>🏆 Pódio — Top 3 Produtos</h2>
-            <span class="rank-by-tag">Quantidade</span>
+        <div class="podio-row">
+          <div class="podio-section">
+            <div class="section-title-bar">
+              <img src="assets/img/badge-maior-pascoa.png" alt="" class="title-badge" />
+              <h2>🏆 Pódio — Top 3 Produtos</h2>
+              <span class="rank-by-tag">Vendas app</span>
+            </div>
+
+            <div class="podio-grid" id="podioGrid"></div>
           </div>
 
-          <div class="podio-grid" id="podioGrid"></div>
+          <div class="podio-section loja-podio-section">
+            <div class="section-title-bar">
+              <h2>🏬 Pódio — Top 3 Lojas</h2>
+              <span class="rank-by-tag">Vendas app</span>
+            </div>
+
+            <div class="podio-grid store-podium-grid" id="storePodiumGrid"></div>
+          </div>
         </div>
       </section>
 
@@ -173,58 +184,17 @@
       <section class="page-section" id="visao-operacional">
         <div class="section-page-header">
           <h2><i class="fas fa-store"></i> Visão Operacional</h2>
-          <p>Resumo diário da campanha e ranking geral de lojas</p>
+          <p>Resumo executivo das vendas app e total por loja</p>
         </div>
 
-        <div class="kpi-row">
-          <div class="kpi-card kpi-purple">
-            <div class="kpi-icon"><i class="fas fa-calendar-check"></i></div>
-            <div class="kpi-info">
-              <span class="kpi-label">Dias Ativos</span>
-              <span class="kpi-value">5</span>
-              <span class="kpi-sub">13/03 a 17/03</span>
-            </div>
-          </div>
-
-          <div class="kpi-card kpi-green">
-            <div class="kpi-icon"><i class="fas fa-user-check"></i></div>
-            <div class="kpi-info">
-              <span class="kpi-label">Clientes Dentro</span>
-              <span class="kpi-value" data-count="4162">0</span>
-              <span class="kpi-sub">clientes únicos</span>
-            </div>
-          </div>
-
-          <div class="kpi-card kpi-orange">
-            <div class="kpi-icon"><i class="fas fa-percent"></i></div>
-            <div class="kpi-info">
-              <span class="kpi-label">Participação</span>
-              <span class="kpi-value">11,05%</span>
-              <span class="kpi-sub">sobre a base</span>
-            </div>
-          </div>
-
-          <div class="kpi-card kpi-pink">
-            <div class="kpi-icon"><i class="fas fa-arrow-trend-up"></i></div>
-            <div class="kpi-info">
-              <span class="kpi-label">Crescimento D13→D14</span>
-              <span class="kpi-value">+291,5%</span>
-              <span class="kpi-sub">em clientes Dentro</span>
-            </div>
-          </div>
-        </div>
+        <div class="kpi-row operational-totalizers" id="operationalTotalizers"></div>
 
         <div class="charts-row-op">
           <div class="chart-card chart-card-wide">
-            <div class="chart-header chart-header-with-actions">
+            <div class="chart-header">
               <div>
-                <h3><i class="fas fa-chart-line"></i> Clientes e Qtd por Dia</h3>
-                <p class="chart-sub">Filtro Dentro / Fora</p>
-              </div>
-
-              <div class="campaign-view-toggle">
-                <button class="campaign-view-btn active" data-view="Dentro">Dentro</button>
-                <button class="campaign-view-btn" data-view="Fora">Fora</button>
+                <h3><i class="fas fa-chart-line"></i> Vendas totais vs vendas app</h3>
+                <p class="chart-sub">Linhas curvas com comparação diária de clientes e vendas</p>
               </div>
             </div>
             <div class="chart-body" style="height:250px">
@@ -234,7 +204,7 @@
 
           <div class="chart-card chart-card-narrow">
             <div class="chart-header">
-              <h3><i class="fas fa-percent"></i> Participação na Base</h3>
+              <h3><i class="fas fa-percent"></i> Clientes participantes na base</h3>
             </div>
             <div class="chart-body chart-center-body" style="height:200px">
               <canvas id="chartOpParticipacao"></canvas>
@@ -244,7 +214,7 @@
         </div>
 
         <div class="section-title-bar" style="margin-top:2rem">
-          <h2>📅 Resumo Diário — Dentro / Fora / Total</h2>
+          <h2>📅 Resumo diário — Compraram, compraram pelo app e vendas</h2>
         </div>
 
         <div class="table-scroll">
@@ -252,15 +222,14 @@
             <thead>
               <tr>
                 <th>Data</th>
-                <th>Dentro Qtd</th>
-                <th>Dentro Tickets</th>
-                <th>Dentro Clientes</th>
-                <th>Fora Qtd</th>
-                <th>Fora Tickets</th>
-                <th>Fora Clientes</th>
-                <th>Total Qtd</th>
-                <th>Total Tickets</th>
-                <th>Total Clientes</th>
+                <th>Vendas app</th>
+                <th>Cupons app</th>
+                <th>Compraram pelo app</th>
+                <th>Vendas totais</th>
+                <th>Cupons totais</th>
+                <th>Compraram</th>
+                <th>Clientes não participantes</th>
+                <th>% app</th>
               </tr>
             </thead>
             <tbody id="dailyCampaignTableBody"></tbody>
@@ -268,7 +237,7 @@
         </div>
 
         <div class="section-title-bar" style="margin-top:2rem">
-          <h2>🏬 Ranking Geral de Lojas — Dentro</h2>
+          <h2>🏬 Lojas — vendas app, vendas totais e CPFs não participantes</h2>
         </div>
 
         <div class="table-scroll">
@@ -277,9 +246,10 @@
               <tr>
                 <th>#</th>
                 <th>Loja</th>
-                <th>Qtd</th>
-                <th>Tickets</th>
-                <th>Clientes</th>
+                <th>Vendas app</th>
+                <th>Vendas totais</th>
+                <th>Compraram pelo app</th>
+                <th>CPFs não participantes</th>
               </tr>
             </thead>
             <tbody id="storesTableBody"></tbody>
@@ -291,12 +261,12 @@
       <section class="page-section" id="ranking">
         <div class="section-page-header">
           <h2><i class="fas fa-trophy"></i> Ranking de Produtos</h2>
-          <p>Ordenado por quantidade vendida na campanha</p>
+          <p>Ordenado por vendas app na campanha</p>
         </div>
 
         <div class="rank-toggle">
-          <button class="toggle-btn active" data-metric="itens">Quantidade</button>
-          <button class="toggle-btn" data-metric="clientes">Clientes</button>
+          <button class="toggle-btn active" data-metric="itens">Vendas app</button>
+          <button class="toggle-btn" data-metric="clientes">Compraram pelo app</button>
         </div>
 
         <div class="chart-card" style="margin-bottom:1.5rem">
@@ -314,10 +284,10 @@
               <tr>
                 <th>#</th>
                 <th>Produto</th>
-                <th>Itens</th>
-                <th>Clientes</th>
-                <th>Cupons</th>
-                <th>Share Itens</th>
+                <th>Vendas app</th>
+                <th>Compraram pelo app</th>
+                <th>Cupons app</th>
+                <th>Share vendas app</th>
               </tr>
             </thead>
             <tbody id="rankTableBody"></tbody>
@@ -385,27 +355,27 @@
           <div class="kpi-card kpi-green">
             <div class="kpi-icon"><i class="fas fa-user-check"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Dentro</span>
+              <span class="kpi-label">Clientes participantes</span>
               <span class="kpi-value" data-count="4162">0</span>
-              <span class="kpi-sub">clientes na campanha</span>
+              <span class="kpi-sub">compraram pelo app</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-orange">
             <div class="kpi-icon"><i class="fas fa-user-xmark"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Fora</span>
+              <span class="kpi-label">Clientes não participantes</span>
               <span class="kpi-value" data-count="33509">0</span>
-              <span class="kpi-sub">clientes fora da campanha</span>
+              <span class="kpi-sub">não compraram pelo app</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-pink">
             <div class="kpi-icon"><i class="fas fa-link"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Overlap</span>
-              <span class="kpi-value">0</span>
-              <span class="kpi-sub">não identificado na planilha</span>
+              <span class="kpi-label">Produtos com vendas app</span>
+              <span class="kpi-value">13</span>
+              <span class="kpi-sub">produtos já ativados</span>
             </div>
           </div>
         </div>
@@ -432,7 +402,7 @@
         </div>
 
         <div class="section-title-bar" style="margin-top:2rem">
-          <h2>📅 Clientes por Dia — Total / Dentro / Fora</h2>
+          <h2>📅 Clientes por dia — compraram vs compraram pelo app</h2>
         </div>
 
         <div class="table-scroll">
@@ -441,9 +411,9 @@
               <tr>
                 <th>Data</th>
                 <th>Total Clientes</th>
-                <th>Dentro</th>
-                <th>Fora</th>
-                <th>% Dentro</th>
+                <th>Compraram pelo app</th>
+                <th>Clientes não participantes</th>
+                <th>% app</th>
               </tr>
             </thead>
             <tbody id="crmDayTableBody"></tbody>
