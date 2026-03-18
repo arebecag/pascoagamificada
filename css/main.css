@@ -15,8 +15,8 @@
 
   --lilac:        #e8a020;
   --lilac-light:  #f4d03f;
-  --mint:         #27ae60;
-  --mint-light:   #a9dfbf;
+  --mint:         #9c5a1a;
+  --mint-light:   #ead3b5;
   --pink:         #d35400;
   --pink-light:   #fdebd0;
   --orange:       #e67e22;
@@ -151,8 +151,8 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--mint);
-  box-shadow: 0 0 6px var(--mint);
+  background: var(--caramel);
+  box-shadow: 0 0 6px rgba(232,160,32,0.5);
   flex-shrink: 0;
 }
 
@@ -315,7 +315,7 @@ body {
 }
 
 .kpi-purple .kpi-icon { background: #fef3e0; color: var(--caramel); }
-.kpi-green  .kpi-icon { background: #e8f8f0; color: var(--mint); }
+.kpi-green  .kpi-icon { background: #f8ecdf; color: var(--mint); }
 .kpi-orange .kpi-icon { background: #fff1df; color: var(--orange); }
 .kpi-pink   .kpi-icon { background: #fde8f4; color: var(--pink); }
 
@@ -895,7 +895,7 @@ body {
 }
 
 .pc-status.active {
-  background: #e8f8f0;
+  background: #f8ecdf;
   color: var(--mint);
 }
 
@@ -962,7 +962,7 @@ body {
 
 .insight-icon.warn  { background: #fef9e7; color: var(--caramel); }
 .insight-icon.info  { background: #fdf1dd; color: var(--caramel); }
-.insight-icon.good  { background: #e8f8f0; color: var(--mint); }
+.insight-icon.good  { background: #f8ecdf; color: var(--mint); }
 .insight-icon.alert { background: #fde8f4; color: var(--pink); }
 
 .insight-text strong {
@@ -981,7 +981,7 @@ body {
 
 /* BADGES */
 .badge-within {
-  background: #e8f8f0;
+  background: #f8ecdf;
   color: var(--mint);
   font-weight: 700;
   padding: 2px 8px;
@@ -1119,4 +1119,35 @@ body {
 ::-webkit-scrollbar-thumb {
   background: var(--choco-light);
   border-radius: 3px;
+}
+
+
+.operational-totalizers {
+  margin-bottom: 1.2rem;
+}
+
+.table-total-row {
+  background: #f9f2e7;
+}
+
+.store-podium-grid .podio-item {
+  min-height: 240px;
+}
+
+.store-badge-wrap {
+  background: radial-gradient(circle at 30% 30%, #fff5df, #f2d4a7);
+}
+
+.store-podium-badge {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, var(--caramel), var(--orange));
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(123,63,26,0.18);
 }

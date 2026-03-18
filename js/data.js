@@ -12,24 +12,24 @@ const PALETA = {
   orangeBg: 'rgba(230,126,34,0.15)',
   caramel: '#e8a020',
   caramelBg: 'rgba(232,160,32,0.18)',
-  mint: '#27ae60',
-  mintBg: 'rgba(39,174,96,0.15)',
+  mint: '#9c5a1a',
+  mintBg: 'rgba(156,90,26,0.14)',
   choco: '#7b3f1a',
   chocoBg: 'rgba(123,63,26,0.12)',
   cream: '#f5ead8',
 };
 
 const TOTAIS = {
-  clientesDentro: 4162,
-  cuponsDentro: 4489,
-  itensDentro: 6616,
-  lojasDentro: 67,
-  participacao: 11.0483,
+  clientesParticipantes: 4162,
+  cuponsApp: 4489,
+  vendasApp: 6616,
+  lojasParticipantes: 67,
+  participacaoApp: 11.0483,
   clientesTotalBase: 37671,
-  clientesForaBase: 33509,
+  clientesNaoParticipantes: 33509,
   overlap: 0,
   produtosCampanha: 19,
-  produtosDentro: 13
+  produtosApp: 13
 };
 
 const EVOLUCAO_DIARIA_CAMPANHA = [
@@ -370,3 +370,36 @@ const RANKING_DENTRO = PRODUTOS_CAMPANHA
   .sort((a, b) => b.itens - a.itens);
 
 const PODIO_TOP3 = RANKING_DENTRO.slice(0, 3);
+
+
+const PARTICIPATION_RATE = TOTAIS.clientesParticipantes / TOTAIS.clientesTotalBase;
+
+const LOJAS_OPERACIONAL = (() => {
+  const totalNaoParticipantes = TOTAIS.clientesNaoParticipantes;
+  const totalClientesApp = RANKING_LOJAS_DENTRO.reduce((sum, row) => sum + row.clientes, 0);
+
+  let allocated = 0;
+
+  return RANKING_LOJAS_DENTRO.map((row, index, arr) => {
+    const estimatedTotalClientes = Math.round(row.clientes / PARTICIPATION_RATE);
+    let naoParticipantes = Math.max(0, estimatedTotalClientes - row.clientes);
+
+    if (index < arr.length - 1) {
+      allocated += naoParticipantes;
+    } else {
+      naoParticipantes = Math.max(0, totalNaoParticipantes - allocated);
+    }
+
+    const vendasTotais = row.qtd + naoParticipantes;
+
+    return {
+      ...row,
+      vendasApp: row.qtd,
+      vendasTotais,
+      cpfsNaoParticipantes: naoParticipantes,
+      shareClientesApp: totalClientesApp > 0 ? row.clientes / totalClientesApp : 0
+    };
+  });
+})();
+
+const PODIO_TOP3_LOJAS = LOJAS_OPERACIONAL.slice(0, 3);
