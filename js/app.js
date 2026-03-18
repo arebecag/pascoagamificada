@@ -9,6 +9,7 @@ Chart.defaults.color = '#888';
 let chartInstances = {};
 let rankMetric = 'itens';
 let currentSection = 'visao-geral';
+let selectedStore = '';
 
 function fmt(n) {
   if (typeof n !== 'number') return n;
@@ -348,6 +349,7 @@ function renderVisaoOperacional() {
   buildOperationalTotalizers();
   buildChartOperacional();
   buildDonutParticipacao();
+  initStoreFilter();
   buildDailyCampaignTable();
   buildStoresTable();
 }
@@ -577,11 +579,42 @@ function buildDailyCampaignTable() {
   `;
 }
 
+function initStoreFilter() {
+  const select = document.getElementById('storeFilter');
+  if (!select) return;
+
+  const options = ['<option value="">Todas as lojas</option>']
+    .concat(LOJAS_OPERACIONAL.map(row => `<option value="${row.loja}">${row.loja}</option>`));
+
+  select.innerHTML = options.join('');
+  select.value = selectedStore;
+  select.onchange = () => {
+    selectedStore = select.value;
+    buildStoresTable();
+  };
+}
+
 function buildStoresTable() {
   const tbody = document.getElementById('storesTableBody');
   if (!tbody) return;
 
-  tbody.innerHTML = LOJAS_OPERACIONAL.map((row, i) => `
+  const filteredRows = selectedStore
+    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore)
+    : LOJAS_OPERACIONAL;
+
+  const totals = filteredRows.reduce((acc, row) => ({
+    vendasApp: acc.vendasApp + row.vendasApp,
+    vendasTotais: acc.vendasTotais + row.vendasTotais,
+    clientes: acc.clientes + row.clientes,
+    cpfsNaoParticipantes: acc.cpfsNaoParticipantes + row.cpfsNaoParticipantes
+  }), {
+    vendasApp: 0,
+    vendasTotais: 0,
+    clientes: 0,
+    cpfsNaoParticipantes: 0
+  });
+
+  tbody.innerHTML = filteredRows.map((row, i) => `
     <tr>
       <td class="rank-num">${i + 1}</td>
       <td><strong>${row.loja}</strong></td>
@@ -592,11 +625,11 @@ function buildStoresTable() {
     </tr>
   `).join('') + `
     <tr class="table-total-row">
-      <td colspan="2"><strong>Total consolidado</strong></td>
-      <td><strong>${fmt(LOJAS_OPERACIONAL.reduce((sum, row) => sum + row.vendasApp, 0))}</strong></td>
-      <td><strong>${fmt(LOJAS_OPERACIONAL.reduce((sum, row) => sum + row.vendasTotais, 0))}</strong></td>
-      <td><strong>${fmt(LOJAS_OPERACIONAL.reduce((sum, row) => sum + row.clientes, 0))}</strong></td>
-      <td><strong>${fmt(LOJAS_OPERACIONAL.reduce((sum, row) => sum + row.cpfsNaoParticipantes, 0))}</strong></td>
+      <td colspan="2"><strong>${selectedStore ? 'Total da loja' : 'Total consolidado'}</strong></td>
+      <td><strong>${fmt(totals.vendasApp)}</strong></td>
+      <td><strong>${fmt(totals.vendasTotais)}</strong></td>
+      <td><strong>${fmt(totals.clientes)}</strong></td>
+      <td><strong>${fmt(totals.cpfsNaoParticipantes)}</strong></td>
     </tr>
   `;
 }
