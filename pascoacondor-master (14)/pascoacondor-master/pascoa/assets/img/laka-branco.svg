@@ -1,0 +1,10 @@
+<svg width="640" height="280" viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <rect x="10" y="40" width="620" height="200" rx="22" fill="#EDE2CF"/>
+  <rect x="10" y="40" width="200" height="200" rx="22" fill="#1D49B6"/>
+  <path d="M146 240C230 132 344 118 630 176V240H146Z" fill="#FFFFFF" opacity="0.92"/>
+  <text x="55" y="150" fill="#FFFFFF" font-size="62" font-weight="800" font-family="Inter,Arial">LACTA</text>
+  <text x="390" y="128" fill="#1D49B6" font-size="68" font-style="italic" font-weight="800" font-family="Inter,Arial" text-anchor="middle">Laka</text>
+  <rect x="330" y="145" width="170" height="50" rx="20" fill="#F8F5EF" stroke="#D6C5A6"/>
+  <circle cx="538" cy="188" r="24" fill="#4DBE47"/>
+  <text x="538" y="194" fill="#fff" font-size="14" font-weight="700" text-anchor="middle" font-family="Inter,Arial">LIFE</text>
+</svg>
