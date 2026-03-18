@@ -496,6 +496,22 @@ body {
   margin-top: 0.2rem;
 }
 
+.podio-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.podio-row .podio-section {
+  margin-top: 0;
+}
+
+.podio-row .podio-grid {
+  max-width: none;
+}
+
+
 .podio-grid {
   display: flex;
   align-items: flex-end;
@@ -1073,6 +1089,10 @@ body {
 
   .charts-row-geral,
   .charts-row-op {
+    grid-template-columns: 1fr;
+  }
+
+  .podio-row {
     grid-template-columns: 1fr;
   }
 

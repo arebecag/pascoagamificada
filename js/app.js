@@ -528,6 +528,28 @@ function buildDailyCampaignTable() {
   const tbody = document.getElementById('dailyCampaignTableBody');
   if (!tbody) return;
 
+  const total = EVOLUCAO_DIARIA_CAMPANHA.reduce((acc, d) => ({
+    appVendas: acc.appVendas + d.Dentro.qtd,
+    appCupons: acc.appCupons + d.Dentro.tickets,
+    clientesApp: acc.clientesApp + d.Dentro.clientes,
+    vendasTotais: acc.vendasTotais + d.Total.qtd,
+    cuponsTotais: acc.cuponsTotais + d.Total.tickets,
+    clientesTotais: acc.clientesTotais + d.Total.clientes,
+    clientesNaoParticipantes: acc.clientesNaoParticipantes + d.Fora.clientes
+  }), {
+    appVendas: 0,
+    appCupons: 0,
+    clientesApp: 0,
+    vendasTotais: 0,
+    cuponsTotais: 0,
+    clientesTotais: 0,
+    clientesNaoParticipantes: 0
+  });
+
+  const totalPct = total.clientesTotais > 0
+    ? (total.clientesApp / total.clientesTotais) * 100
+    : 0;
+
   tbody.innerHTML = EVOLUCAO_DIARIA_CAMPANHA.map(d => `
     <tr>
       <td><strong>${d.data}</strong></td>
@@ -540,7 +562,19 @@ function buildDailyCampaignTable() {
       <td>${fmt(d.Fora.clientes)}</td>
       <td>${fmtPct((d.Dentro.clientes / d.Total.clientes) * 100, 1)}</td>
     </tr>
-  `).join('');
+  `).join('') + `
+    <tr class="table-total-row">
+      <td><strong>Total</strong></td>
+      <td><strong>${fmt(total.appVendas)}</strong></td>
+      <td><strong>${fmt(total.appCupons)}</strong></td>
+      <td><strong>${fmt(total.clientesApp)}</strong></td>
+      <td><strong>${fmt(total.vendasTotais)}</strong></td>
+      <td><strong>${fmt(total.cuponsTotais)}</strong></td>
+      <td><strong>${fmt(total.clientesTotais)}</strong></td>
+      <td><strong>${fmt(total.clientesNaoParticipantes)}</strong></td>
+      <td><strong>${fmtPct(totalPct, 1)}</strong></td>
+    </tr>
+  `;
 }
 
 function buildStoresTable() {
