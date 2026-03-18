@@ -360,13 +360,33 @@ function buildOperationalTotalizers() {
   if (!container) return;
 
   const growth = ((EVOLUCAO_DIARIA_CAMPANHA[1].Dentro.clientes - EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) / EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) * 100;
-  const totalVendas = EVOLUCAO_DIARIA_GERAL.reduce((sum, row) => sum + row.qtd, 0);
+  const scopeRows = selectedStore
+    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore)
+    : LOJAS_OPERACIONAL;
+
+  const scopeTotals = scopeRows.reduce((acc, row) => ({
+    vendasApp: acc.vendasApp + row.vendasApp,
+    vendasTotais: acc.vendasTotais + row.vendasTotais,
+    clientesParticipantes: acc.clientesParticipantes + row.clientes,
+    cpfsNaoParticipantes: acc.cpfsNaoParticipantes + row.cpfsNaoParticipantes
+  }), {
+    vendasApp: 0,
+    vendasTotais: 0,
+    clientesParticipantes: 0,
+    cpfsNaoParticipantes: 0
+  });
+
+  const participation = scopeTotals.clientesParticipantes + scopeTotals.cpfsNaoParticipantes > 0
+    ? (scopeTotals.clientesParticipantes / (scopeTotals.clientesParticipantes + scopeTotals.cpfsNaoParticipantes)) * 100
+    : TOTAIS.participacaoApp;
+
+  const scopeLabel = selectedStore ? selectedStore : 'todas as lojas';
 
   const cards = [
-    { cls: 'kpi-purple', icon: 'fa-cart-shopping', label: 'Vendas app', value: fmt(TOTAIS.vendasApp), sub: 'total consolidado do app' },
-    { cls: 'kpi-green', icon: 'fa-store', label: 'Vendas totais', value: fmt(totalVendas), sub: 'total consolidado da campanha' },
-    { cls: 'kpi-orange', icon: 'fa-users', label: 'Clientes participantes', value: fmt(TOTAIS.clientesParticipantes), sub: `${fmtPct(TOTAIS.participacaoApp, 2)} da base` },
-    { cls: 'kpi-pink', icon: 'fa-user-xmark', label: 'CPFs não participantes', value: fmt(TOTAIS.clientesNaoParticipantes), sub: `crescimento diário ${fmtPct(growth, 1)}` }
+    { cls: 'kpi-purple', icon: 'fa-cart-shopping', label: 'Vendas app', value: fmt(scopeTotals.vendasApp), sub: `recorte: ${scopeLabel}` },
+    { cls: 'kpi-green', icon: 'fa-store', label: 'Vendas totais', value: fmt(scopeTotals.vendasTotais), sub: `recorte: ${scopeLabel}` },
+    { cls: 'kpi-orange', icon: 'fa-users', label: 'Clientes participantes', value: fmt(scopeTotals.clientesParticipantes), sub: `${fmtPct(participation, 2)} no recorte` },
+    { cls: 'kpi-pink', icon: 'fa-user-xmark', label: 'CPFs não participantes', value: fmt(scopeTotals.cpfsNaoParticipantes), sub: selectedStore ? 'loja selecionada' : `crescimento diário ${fmtPct(growth, 1)}` }
   ];
 
   container.innerHTML = cards.map(card => `
@@ -581,6 +601,7 @@ function buildDailyCampaignTable() {
 
 function initStoreFilter() {
   const select = document.getElementById('storeFilter');
+  const clearButton = document.getElementById('clearStoreFilter');
   if (!select) return;
 
   const options = ['<option value="">Todas as lojas</option>']
@@ -590,8 +611,18 @@ function initStoreFilter() {
   select.value = selectedStore;
   select.onchange = () => {
     selectedStore = select.value;
+    buildOperationalTotalizers();
     buildStoresTable();
   };
+
+  if (clearButton) {
+    clearButton.onclick = () => {
+      selectedStore = '';
+      select.value = '';
+      buildOperationalTotalizers();
+      buildStoresTable();
+    };
+  }
 }
 
 function buildStoresTable() {
