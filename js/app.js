@@ -226,7 +226,7 @@ function buildChartEvolucaoGeral() {
       labels: series.labels,
       datasets: [
         {
-          label: 'Compraram',
+          label: 'Views',
           data: series.totalClientes,
           borderColor: PALETA.lilac,
           backgroundColor: PALETA.lilacBg,
@@ -241,7 +241,7 @@ function buildChartEvolucaoGeral() {
           fill: false
         },
         {
-          label: 'Compraram pelo app',
+          label: 'Scan Success',
           data: series.clientesApp,
           borderColor: PALETA.pink,
           backgroundColor: PALETA.pinkBg,
@@ -272,8 +272,8 @@ function buildChartEvolucaoGeral() {
           fill: false
         },
         {
-          label: 'Vendas app',
-          data: series.appVendas,
+          label: 'Cupons com itens da campanha',
+          data: series.appCupons,
           borderColor: PALETA.orange,
           backgroundColor: PALETA.orangeBg,
           borderWidth: 2,
@@ -336,12 +336,12 @@ function buildDonutCampanha() {
     type: 'doughnut',
     data: {
       labels: [
-        `Clientes participantes (${fmt(TOTAIS.clientesParticipantes)})`,
-        `Clientes não participantes (${fmt(TOTAIS.clientesNaoParticipantes)})`
+        `Com app instalado (${fmt(TOTAIS.clientesComAppInstalado)})`,
+        `Sem app instalado (${fmt(TOTAIS.clientesSemAppInstalado)})`
       ],
       datasets: [{
-        data: [TOTAIS.clientesParticipantes, TOTAIS.clientesNaoParticipantes],
-        backgroundColor: [PALETA.lilac, '#f5ead8'],
+        data: [TOTAIS.clientesComAppInstalado, TOTAIS.clientesSemAppInstalado],
+        backgroundColor: [PALETA.cream, PALETA.lilac],
         borderColor: ['#fff', '#fff'],
         borderWidth: 3,
         hoverOffset: 8
@@ -357,7 +357,7 @@ function buildDonutCampanha() {
           backgroundColor: 'rgba(61,26,0,0.9)',
           callbacks: {
             label: ctx => {
-              const total = TOTAIS.clientesParticipantes + TOTAIS.clientesNaoParticipantes;
+              const total = TOTAIS.clientesCompraramCampanha;
               const pct = (ctx.parsed / total) * 100;
               return ` ${fmt(ctx.parsed)} clientes (${fmtPct(pct, 1)})`;
             }
@@ -465,7 +465,7 @@ function buildChartOperacional() {
       labels: series.labels,
       datasets: [
         {
-          label: 'Compraram',
+          label: 'Views',
           data: series.totalClientes,
           borderColor: PALETA.lilac,
           backgroundColor: PALETA.lilacBg,
@@ -479,7 +479,7 @@ function buildChartOperacional() {
           fill: false
         },
         {
-          label: 'Compraram pelo app',
+          label: 'Scan Success',
           data: series.clientesApp,
           borderColor: PALETA.pink,
           backgroundColor: PALETA.pinkBg,
@@ -508,8 +508,8 @@ function buildChartOperacional() {
           fill: false
         },
         {
-          label: 'Vendas app',
-          data: series.appVendas,
+          label: 'Cupons com itens da campanha',
+          data: series.appCupons,
           borderColor: PALETA.orange,
           backgroundColor: PALETA.orangeBg,
           borderWidth: 2,
@@ -559,17 +559,17 @@ function buildDonutParticipacao() {
   const legend = document.getElementById('operacionalLegend');
   if (!ctx || !legend) return;
 
-  const value = TOTAIS.clientesParticipantes;
-  const remainder = TOTAIS.clientesNaoParticipantes;
-  const pct = (value / TOTAIS.clientesTotalBase) * 100;
+  const value = TOTAIS.scanSuccess;
+  const remainder = TOTAIS.viewsCampanha;
+  const pct = remainder > 0 ? (value / remainder) * 100 : 0;
 
   chartInstances.chartOpParticipacao = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: ['Clientes participantes', 'Clientes não participantes'],
+      labels: ['Clientes abriram o app', 'Clientes escanearam'],
       datasets: [{
-        data: [value, remainder],
-        backgroundColor: [PALETA.lilac, '#f5ead8'],
+        data: [remainder, value],
+        backgroundColor: [PALETA.cream, PALETA.lilac],
         borderColor: ['#fff', '#fff'],
         borderWidth: 3,
         hoverOffset: 8
@@ -592,8 +592,8 @@ function buildDonutParticipacao() {
   });
 
   legend.innerHTML = `
-    <span class="dot dot-purple"></span><span>Clientes participantes <strong>${fmtPct(pct, 1)}</strong></span>
-    <span class="dot dot-cream"></span><span>Clientes não participantes <strong>${fmtPct(100 - pct, 1)}</strong></span>
+    <span class="dot dot-purple"></span><span>Scan Success <strong>${fmt(value)}</strong></span>
+    <span class="dot dot-cream"></span><span>Views <strong>${fmt(remainder)}</strong></span>
   `;
 }
 

@@ -103,40 +103,49 @@
           />
         </div>
 
-        <div class="kpi-row">
-          <div class="kpi-card kpi-purple">
+        <div class="kpi-row kpi-row-geral">
+          <div class="kpi-card kpi-purple kpi-card-highlight">
             <div class="kpi-icon"><i class="fas fa-users"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Clientes que compraram</span>
+              <span class="kpi-label">Clientes compraram produtos da gamificação</span>
               <span class="kpi-value" data-count="44662">0</span>
-              <span class="kpi-sub">total da campanha</span>
+              <span class="kpi-sub">total de clientes da campanha</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-green">
-            <div class="kpi-icon"><i class="fas fa-user-xmark"></i></div>
+            <div class="kpi-icon"><i class="fas fa-mobile-screen-button"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Clientes não participantes</span>
-              <span class="kpi-value" data-count="40304">0</span>
-              <span class="kpi-sub">não compraram pelo app</span>
+              <span class="kpi-label">Clientes com app instalado</span>
+              <span class="kpi-value" data-count="5496">0</span>
+              <span class="kpi-sub">12,3% de quem comprou</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-orange">
-            <div class="kpi-icon"><i class="fas fa-cart-shopping"></i></div>
+            <div class="kpi-icon"><i class="fas fa-qrcode"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Vendas app</span>
-              <span class="kpi-value" data-count="8808">0</span>
-              <span class="kpi-sub">itens vendidos pelo app</span>
+              <span class="kpi-label">Clientes escanearam</span>
+              <span class="kpi-value" data-count="5496">0</span>
+              <span class="kpi-sub">scan success da campanha</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-pink">
+            <div class="kpi-icon"><i class="fas fa-receipt"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-label">Cupons com itens da campanha</span>
+              <span class="kpi-value" data-count="5926">0</span>
+              <span class="kpi-sub">cupons com produtos da gamificação</span>
+            </div>
+          </div>
+
+          <div class="kpi-card kpi-green">
             <div class="kpi-icon"><i class="fas fa-store"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Lojas com vendas app</span>
+              <span class="kpi-label">Lojas com venda dos produtos da campanha</span>
               <span class="kpi-value" data-count="67">0</span>
-              <span class="kpi-sub">filiais participantes</span>
+              <span class="kpi-sub">lojas com vendas no período</span>
             </div>
           </div>
         </div>
@@ -155,15 +164,15 @@
 
           <div class="chart-card chart-card-narrow">
             <div class="chart-header">
-              <h3><i class="fas fa-circle-half-stroke"></i> Participação na base</h3>
-              <p class="chart-sub">Clientes participantes vs não participantes</p>
+              <h3><i class="fas fa-circle-half-stroke"></i> App instalado na base compradora</h3>
+              <p class="chart-sub">Desses clientes que compraram, quantos têm o app instalado</p>
             </div>
             <div class="chart-body chart-center-body" style="height:200px">
               <canvas id="chartDonutClientes"></canvas>
             </div>
             <div class="donut-legend">
-              <span class="dot dot-purple"></span><span>Clientes participantes <strong>5.496</strong></span>
-              <span class="dot dot-cream"></span><span>Clientes não participantes <strong>40.304</strong></span>
+              <span class="dot dot-purple"></span><span>Com app instalado <strong>5.496</strong></span>
+              <span class="dot dot-cream"></span><span>Sem app instalado <strong>39.166</strong></span>
             </div>
           </div>
         </div>
@@ -214,7 +223,7 @@
 
           <div class="chart-card chart-card-narrow">
             <div class="chart-header">
-              <h3><i class="fas fa-percent"></i> Clientes participantes na base</h3>
+              <h3><i class="fas fa-percent"></i> Participação da base</h3>
             </div>
             <div class="chart-body chart-center-body" style="height:200px">
               <canvas id="chartOpParticipacao"></canvas>

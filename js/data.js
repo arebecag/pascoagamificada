@@ -27,6 +27,11 @@ const TOTAIS = {
   participacaoApp: 12,
   clientesTotalBase: 45800,
   clientesNaoParticipantes: 40304,
+  clientesCompraramCampanha: 44662,
+  clientesComAppInstalado: 5496,
+  clientesSemAppInstalado: 39166,
+  viewsCampanha: 44662,
+  scanSuccess: 5496,
   overlap: 0,
   produtosCampanha: 19,
   produtosApp: 13

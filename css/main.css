@@ -394,6 +394,14 @@ body {
   color: #a7927c;
 }
 
+.kpi-row-geral {
+  grid-template-columns: 1.4fr repeat(4, 1fr);
+}
+
+.kpi-card-highlight {
+  background: linear-gradient(180deg, #fffaf2, #fff);
+}
+
 /* CHARTS */
 .charts-row-geral,
 .charts-row-op {
@@ -1125,6 +1133,10 @@ body {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .kpi-row-geral {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .charts-row-geral,
   .charts-row-op,
   .podio-row {
@@ -1160,7 +1172,6 @@ body {
     display: flex;
   }
 
-
   .sidebar {
     transform: translateX(-100%);
     width: min(82vw, 320px);
@@ -1186,7 +1197,8 @@ body {
     padding-right: 0;
   }
 
-  .kpi-row {
+  .kpi-row,
+  .kpi-row-geral {
     grid-template-columns: 1fr;
   }
 
