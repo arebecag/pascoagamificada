@@ -30,6 +30,26 @@ function fmtPct(n, d = 1) {
   }) + '%';
 }
 
+
+function getDonutCenterPlugin(text) {
+  return {
+    id: 'centerText',
+    afterDraw(chart) {
+      const { ctx, chartArea } = chart;
+      if (!chartArea) return;
+      const x = (chartArea.left + chartArea.right) / 2;
+      const y = (chartArea.top + chartArea.bottom) / 2;
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#7b3f1a';
+      ctx.font = '700 22px Inter';
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
+  };
+}
+
 function destroyChart(id) {
   if (chartInstances[id]) {
     chartInstances[id].destroy();
@@ -334,13 +354,14 @@ function buildDonutCampanha() {
 
   chartInstances.chartDonutClientes = new Chart(ctx, {
     type: 'doughnut',
+    plugins: [getDonutCenterPlugin('2,0%')],
     data: {
       labels: [
-        `Com app instalado (${fmt(TOTAIS.clientesComAppInstalado)})`,
-        `Sem app instalado (${fmt(TOTAIS.clientesSemAppInstalado)})`
+        `Abriu scan (${fmt(TOTAIS.gamificacaoAbriuScan)})`,
+        `Não abriu scan (${fmt(TOTAIS.gamificacaoAbriuJogo - TOTAIS.gamificacaoAbriuScan)})`
       ],
       datasets: [{
-        data: [TOTAIS.clientesComAppInstalado, TOTAIS.clientesSemAppInstalado],
+        data: [TOTAIS.gamificacaoAbriuScan, TOTAIS.gamificacaoAbriuJogo - TOTAIS.gamificacaoAbriuScan],
         backgroundColor: [PALETA.cream, PALETA.lilac],
         borderColor: ['#fff', '#fff'],
         borderWidth: 3,
@@ -357,7 +378,7 @@ function buildDonutCampanha() {
           backgroundColor: 'rgba(61,26,0,0.9)',
           callbacks: {
             label: ctx => {
-              const total = TOTAIS.clientesCompraramCampanha;
+              const total = TOTAIS.gamificacaoAbriuJogo;
               const pct = (ctx.parsed / total) * 100;
               return ` ${fmt(ctx.parsed)} clientes (${fmtPct(pct, 1)})`;
             }
@@ -559,16 +580,18 @@ function buildDonutParticipacao() {
   const legend = document.getElementById('operacionalLegend');
   if (!ctx || !legend) return;
 
-  const value = TOTAIS.scanSuccess;
-  const remainder = TOTAIS.viewsCampanha;
-  const pct = remainder > 0 ? (value / remainder) * 100 : 0;
+  const value = TOTAIS.gamificacaoEscaneou;
+  const remainder = TOTAIS.gamificacaoAbriuScan - TOTAIS.gamificacaoEscaneou;
+  const total = TOTAIS.gamificacaoAbriuScan;
+  const pct = total > 0 ? (value / total) * 100 : 0;
 
   chartInstances.chartOpParticipacao = new Chart(ctx, {
     type: 'doughnut',
+    plugins: [getDonutCenterPlugin(fmtPct(pct, 1))],
     data: {
-      labels: ['Clientes abriram o app', 'Clientes escanearam'],
+      labels: ['Escaneou', 'Não escaneou'],
       datasets: [{
-        data: [remainder, value],
+        data: [value, remainder],
         backgroundColor: [PALETA.cream, PALETA.lilac],
         borderColor: ['#fff', '#fff'],
         borderWidth: 3,
@@ -584,7 +607,7 @@ function buildDonutParticipacao() {
         tooltip: {
           backgroundColor: 'rgba(61,26,0,0.9)',
           callbacks: {
-            label: ctx => ` ${fmt(ctx.parsed)} clientes`
+            label: ctx => ` ${fmt(ctx.parsed)} clientes (${fmtPct((ctx.parsed / total) * 100, 1)})`
           }
         }
       }
@@ -592,8 +615,8 @@ function buildDonutParticipacao() {
   });
 
   legend.innerHTML = `
-    <span class="dot dot-purple"></span><span>Scan Success <strong>${fmt(value)}</strong></span>
-    <span class="dot dot-cream"></span><span>Views <strong>${fmt(remainder)}</strong></span>
+    <span class="dot dot-purple"></span><span>Escaneou <strong>${fmt(value)}</strong></span>
+    <span class="dot dot-cream"></span><span>Não escaneou <strong>${fmt(remainder)}</strong></span>
   `;
 }
 

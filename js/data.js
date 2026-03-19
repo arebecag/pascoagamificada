@@ -32,6 +32,10 @@ const TOTAIS = {
   clientesSemAppInstalado: 39166,
   viewsCampanha: 44662,
   scanSuccess: 5496,
+  gamificacaoAbriuJogo: 16752,
+  gamificacaoAbriuScan: 329,
+  gamificacaoEscaneou: 313,
+  gamificacaoCompletou: 18,
   overlap: 0,
   produtosCampanha: 19,
   produtosApp: 13
