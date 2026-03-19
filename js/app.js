@@ -587,11 +587,11 @@ function buildDonutParticipacao() {
 
   const periodTotals = getOperationalPeriodTotals();
   const value = selectedStore
-    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore).reduce((sum, row) => sum + row.clientes, 0)
-    : periodTotals.clientesParticipantes;
+    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore).reduce((sum, row) => sum + row.clientesComApp, 0)
+    : TOTAIS.clientesComAppInstalado;
   const remainder = selectedStore
     ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore).reduce((sum, row) => sum + row.clientesSemApp, 0)
-    : periodTotals.clientesSemApp;
+    : (TOTAIS.clientesCompraramCampanha - TOTAIS.clientesComAppInstalado);
   const total = value + remainder;
   const pct = total > 0 ? (value / total) * 100 : 0;
 

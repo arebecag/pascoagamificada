@@ -392,37 +392,43 @@ const PODIO_TOP3 = RANKING_DENTRO.slice(0, 3);
 const PARTICIPATION_RATE = TOTAIS.clientesParticipantes / TOTAIS.clientesTotalBase;
 
 const LOJAS_OPERACIONAL = (() => {
-  const totalNaoParticipantes = TOTAIS.clientesNaoParticipantes;
-  const totalClientesApp = RANKING_LOJAS_DENTRO.reduce((sum, row) => sum + row.clientes, 0);
-  const appCoverageRate = TOTAIS.clientesCompraramCampanha > 0
-    ? TOTAIS.clientesComAppInstalado / TOTAIS.clientesCompraramCampanha
-    : 0;
-
-  let allocated = 0;
+  const totalShareBase = RANKING_LOJAS_DENTRO.reduce((sum, row) => sum + row.clientes, 0);
+  let allocatedClientesCampanha = 0;
+  let allocatedClientesComApp = 0;
+  let allocatedCuponsVendas = 0;
 
   return RANKING_LOJAS_DENTRO.map((row, index, arr) => {
-    const estimatedTotalClientes = Math.round(row.clientes / PARTICIPATION_RATE);
-    let naoParticipantes = Math.max(0, estimatedTotalClientes - row.clientes);
+    const share = totalShareBase > 0 ? row.clientes / totalShareBase : 0;
+
+    let clientesCampanha;
+    let clientesComApp;
+    let cuponsVendas;
 
     if (index < arr.length - 1) {
-      allocated += naoParticipantes;
+      clientesCampanha = Math.round(TOTAIS.clientesCompraramCampanha * share);
+      clientesComApp = Math.round(TOTAIS.clientesComAppInstalado * share);
+      cuponsVendas = Math.round(TOTAIS.cuponsVendasCampanha * share);
+
+      allocatedClientesCampanha += clientesCampanha;
+      allocatedClientesComApp += clientesComApp;
+      allocatedCuponsVendas += cuponsVendas;
     } else {
-      naoParticipantes = Math.max(0, totalNaoParticipantes - allocated);
+      clientesCampanha = TOTAIS.clientesCompraramCampanha - allocatedClientesCampanha;
+      clientesComApp = TOTAIS.clientesComAppInstalado - allocatedClientesComApp;
+      cuponsVendas = TOTAIS.cuponsVendasCampanha - allocatedCuponsVendas;
     }
 
-    const clientesCampanha = row.clientes + naoParticipantes;
-    const clientesComApp = Math.round(clientesCampanha * appCoverageRate);
-    const vendasTotais = row.qtd + naoParticipantes;
+    const clientesSemApp = Math.max(0, clientesCampanha - clientesComApp);
 
     return {
       ...row,
       vendasApp: row.qtd,
-      vendasTotais,
-      clientesSemApp: naoParticipantes,
+      vendasTotais: cuponsVendas,
+      clientesSemApp,
       clientesCampanha,
       clientesComApp,
-      cuponsVendas: vendasTotais,
-      shareClientesApp: totalClientesApp > 0 ? row.clientes / totalClientesApp : 0
+      cuponsVendas,
+      shareClientesApp: share
     };
   });
 })();
