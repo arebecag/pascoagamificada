@@ -54,6 +54,32 @@ function animateCounters() {
   });
 }
 
+
+function initMobileMenu() {
+  const sidebar = document.getElementById('sidebar');
+  const button = document.getElementById('mobileMenuBtn');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (!sidebar || !button || !overlay) return;
+
+  const closeMenu = () => {
+    sidebar.classList.remove('mobile-open');
+    overlay.classList.remove('active');
+  };
+
+  button.addEventListener('click', () => {
+    const open = sidebar.classList.toggle('mobile-open');
+    overlay.classList.toggle('active', open);
+  });
+
+  overlay.addEventListener('click', closeMenu);
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 800) closeMenu();
+    });
+  });
+}
+
 function initNav() {
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', e => {
@@ -1071,6 +1097,7 @@ function buildCRMInsights() {
 //  INIT
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
+  initMobileMenu();
   initNav();
   renderVisaoGeral();
   animateCounters();
