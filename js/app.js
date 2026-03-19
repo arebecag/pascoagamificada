@@ -430,7 +430,6 @@ function buildOperationalTotalizers() {
   const participation = scopeTotals.clientesParticipantes + scopeTotals.cpfsNaoParticipantes > 0
     ? (scopeTotals.clientesParticipantes / (scopeTotals.clientesParticipantes + scopeTotals.cpfsNaoParticipantes)) * 100
     : TOTAIS.participacaoApp;
-
   const scopeLabel = selectedStore ? selectedStore : '13/03 a 18/03';
 
   const cards = [
