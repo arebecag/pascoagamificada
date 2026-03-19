@@ -1156,13 +1156,10 @@ body {
     min-height: calc(100dvh - 48px);
   }
 
-<<<<<<< codex/update-easter-dashboard-layout-and-metrics-1mi3d1
   .mobile-topbar {
     display: flex;
   }
 
-=======
->>>>>>> master
   .sidebar {
     transform: translateX(-100%);
     width: min(82vw, 320px);
