@@ -1,6 +1,6 @@
 // ============================================================
 //  DASHBOARD PÁSCOA — APP.JS
-//  Versão TV: Dentro e Fora no mesmo gráfico, sem botões
+//  Versão TV: leitura executiva de participantes, vendas app e vendas totais
 // ============================================================
 
 Chart.defaults.font.family = "'Inter', sans-serif";
@@ -9,6 +9,7 @@ Chart.defaults.color = '#888';
 let chartInstances = {};
 let rankMetric = 'itens';
 let currentSection = 'visao-geral';
+let selectedStore = '';
 
 function fmt(n) {
   if (typeof n !== 'number') return n;
@@ -27,6 +28,26 @@ function fmtPct(n, d = 1) {
     minimumFractionDigits: d,
     maximumFractionDigits: d
   }) + '%';
+}
+
+
+function getDonutCenterPlugin(text) {
+  return {
+    id: 'centerText',
+    afterDraw(chart) {
+      const { ctx, chartArea } = chart;
+      if (!chartArea) return;
+      const x = (chartArea.left + chartArea.right) / 2;
+      const y = (chartArea.top + chartArea.bottom) / 2;
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#7b3f1a';
+      ctx.font = '700 22px Inter';
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
+  };
 }
 
 function destroyChart(id) {
@@ -50,6 +71,32 @@ function animateCounters() {
       el.textContent = fmt(current);
       if (current >= target) clearInterval(timer);
     }, 16);
+  });
+}
+
+
+function initMobileMenu() {
+  const sidebar = document.getElementById('sidebar');
+  const button = document.getElementById('mobileMenuBtn');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (!sidebar || !button || !overlay) return;
+
+  const closeMenu = () => {
+    sidebar.classList.remove('mobile-open');
+    overlay.classList.remove('active');
+  };
+
+  button.addEventListener('click', () => {
+    const open = sidebar.classList.toggle('mobile-open');
+    overlay.classList.toggle('active', open);
+  });
+
+  overlay.addEventListener('click', closeMenu);
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 800) closeMenu();
+    });
   });
 }
 
@@ -97,9 +144,9 @@ function renderSection(id) {
 }
 
 /**
- * Série completa 01/03 a 17/03
- * - Antes de 13/03: Dentro = 0, Fora = Total do dia
- * - 13/03 em diante: Dentro e Fora conforme planilha
+ * Série completa 01/03 a 18/03
+ * - Antes de 13/03: participantes app = 0 e demais clientes = total do dia
+ * - 13/03 em diante: participantes app e não participantes conforme planilha
  */
 function getFullCampaignSeries() {
   const campaignMap = Object.fromEntries(
@@ -111,15 +158,13 @@ function getFullCampaignSeries() {
   return {
     labels,
 
-    dentroQtd: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Dentro.qtd ?? 0),
-    dentroTickets: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Dentro.tickets ?? 0),
-    dentroClientes: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Dentro.clientes ?? 0),
+    appVendas: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Dentro.qtd ?? 0),
+    appCupons: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Dentro.tickets ?? 0),
+    clientesApp: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Dentro.clientes ?? 0),
 
-    foraQtd: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Fora.qtd ?? d.qtd),
-    foraTickets: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Fora.tickets ?? d.cupons),
-    foraClientes: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Fora.clientes ?? d.clientes),
+    clientesNaoParticipantes: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Fora.clientes ?? d.clientes),
 
-    totalQtd: EVOLUCAO_DIARIA_GERAL.map(d => d.qtd),
+    totalVendas: EVOLUCAO_DIARIA_GERAL.map(d => d.qtd),
     totalTickets: EVOLUCAO_DIARIA_GERAL.map(d => d.cupons),
     totalClientes: EVOLUCAO_DIARIA_GERAL.map(d => d.clientes)
   };
@@ -130,6 +175,7 @@ function getFullCampaignSeries() {
 // ═══════════════════════════════════════════════════════════════
 function renderVisaoGeral() {
   buildPodio();
+  buildStorePodio();
   buildChartEvolucaoGeral();
   buildDonutCampanha();
 }
@@ -155,8 +201,33 @@ function buildPodio() {
       <div class="podio-bar ${bars[i]}"></div>
       <div class="podio-info">
         <strong>${item.nome}</strong>
-        <span class="podio-qty">${fmt(item.itens)} itens</span>
-        <span class="podio-clients">${fmt(item.clientes)} clientes</span>
+        <span class="podio-qty">${fmt(item.itens)} vendas app</span>
+        <span class="podio-clients">${fmt(item.clientes)} compraram pelo app</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+
+function buildStorePodio() {
+  const grid = document.getElementById('storePodiumGrid');
+  if (!grid) return;
+
+  const medals = ['🥇', '🥈', '🥉'];
+  const bars = ['podio-bar-1', 'podio-bar-2', 'podio-bar-3'];
+
+  grid.innerHTML = PODIO_TOP3_LOJAS.map((item, i) => `
+    <div class="podio-item podio-${i + 1} store-podium-item">
+      <div class="podio-img-wrap store-badge-wrap ${i === 0 ? 'podio-img-crown' : ''}">
+        ${i === 0 ? '<div class="crown-icon">👑</div>' : ''}
+        <div class="store-podium-badge">${i + 1}º</div>
+      </div>
+      <div class="podio-medal">${medals[i]}</div>
+      <div class="podio-bar ${bars[i]}"></div>
+      <div class="podio-info">
+        <strong>${item.loja}</strong>
+        <span class="podio-qty">${fmt(item.vendasApp)} vendas app</span>
+        <span class="podio-clients">${fmt(item.clientesSemApp)} clientes sem app</span>
       </div>
     </div>
   `).join('');
@@ -175,8 +246,8 @@ function buildChartEvolucaoGeral() {
       labels: series.labels,
       datasets: [
         {
-          label: 'Clientes — Dentro',
-          data: series.dentroClientes,
+          label: 'Compraram',
+          data: series.totalClientes,
           borderColor: PALETA.lilac,
           backgroundColor: PALETA.lilacBg,
           borderWidth: 3,
@@ -190,8 +261,8 @@ function buildChartEvolucaoGeral() {
           fill: false
         },
         {
-          label: 'Clientes — Fora',
-          data: series.foraClientes,
+          label: 'Compraram pelo app',
+          data: series.clientesApp,
           borderColor: PALETA.pink,
           backgroundColor: PALETA.pinkBg,
           borderWidth: 3,
@@ -205,14 +276,14 @@ function buildChartEvolucaoGeral() {
           fill: false
         },
         {
-          label: 'Qtd — Dentro',
-          data: series.dentroQtd,
-          borderColor: PALETA.mint,
-          backgroundColor: PALETA.mintBg,
+          label: 'Vendas totais',
+          data: series.totalVendas,
+          borderColor: PALETA.choco,
+          backgroundColor: PALETA.chocoBg,
           borderWidth: 2,
           pointRadius: 3,
           pointHoverRadius: 5,
-          pointBackgroundColor: PALETA.mint,
+          pointBackgroundColor: PALETA.choco,
           pointBorderColor: '#fff',
           pointBorderWidth: 2,
           cubicInterpolationMode: 'monotone',
@@ -221,8 +292,8 @@ function buildChartEvolucaoGeral() {
           fill: false
         },
         {
-          label: 'Qtd — Fora',
-          data: series.foraQtd,
+          label: 'Cupons na campanha',
+          data: series.appCupons,
           borderColor: PALETA.orange,
           backgroundColor: PALETA.orangeBg,
           borderWidth: 2,
@@ -283,14 +354,15 @@ function buildDonutCampanha() {
 
   chartInstances.chartDonutClientes = new Chart(ctx, {
     type: 'doughnut',
+    plugins: [getDonutCenterPlugin(fmtPct((TOTAIS.clientesComAppInstalado / TOTAIS.clientesCompraramCampanha) * 100, 1))],
     data: {
       labels: [
-        `Dentro (${fmt(TOTAIS.clientesDentro)})`,
-        `Fora (${fmt(TOTAIS.clientesForaBase)})`
+        `Cliente Com APP (${fmt(TOTAIS.clientesComAppInstalado)})`,
+        `Cliente Sem APP (${fmt(TOTAIS.clientesSemAppInstalado)})`
       ],
       datasets: [{
-        data: [TOTAIS.clientesDentro, TOTAIS.clientesForaBase],
-        backgroundColor: [PALETA.lilac, '#f5ead8'],
+        data: [TOTAIS.clientesComAppInstalado, TOTAIS.clientesSemAppInstalado],
+        backgroundColor: [PALETA.cream, PALETA.lilac],
         borderColor: ['#fff', '#fff'],
         borderWidth: 3,
         hoverOffset: 8
@@ -306,7 +378,7 @@ function buildDonutCampanha() {
           backgroundColor: 'rgba(61,26,0,0.9)',
           callbacks: {
             label: ctx => {
-              const total = TOTAIS.clientesDentro + TOTAIS.clientesForaBase;
+              const total = TOTAIS.clientesCompraramCampanha;
               const pct = (ctx.parsed / total) * 100;
               return ` ${fmt(ctx.parsed)} clientes (${fmtPct(pct, 1)})`;
             }
@@ -320,11 +392,85 @@ function buildDonutCampanha() {
 // ═══════════════════════════════════════════════════════════════
 //  VISÃO OPERACIONAL
 // ═══════════════════════════════════════════════════════════════
+
+function getOperationalPeriodTotals() {
+  return EVOLUCAO_DIARIA_CAMPANHA.reduce((acc, day) => ({
+    vendasApp: acc.vendasApp + day.Dentro.qtd,
+    appCupons: acc.appCupons + day.Dentro.tickets,
+    clientesParticipantes: acc.clientesParticipantes + day.Dentro.clientes,
+    vendasTotais: acc.vendasTotais + day.Total.qtd,
+    cuponsTotais: acc.cuponsTotais + day.Total.tickets,
+    clientesTotais: acc.clientesTotais + day.Total.clientes,
+    clientesSemApp: acc.clientesSemApp + day.Fora.clientes
+  }), {
+    vendasApp: 0,
+    appCupons: 0,
+    clientesParticipantes: 0,
+    vendasTotais: 0,
+    cuponsTotais: 0,
+    clientesTotais: 0,
+    clientesSemApp: 0
+  });
+}
+
 function renderVisaoOperacional() {
+  buildOperationalTotalizers();
   buildChartOperacional();
   buildDonutParticipacao();
+  initStoreFilter();
   buildDailyCampaignTable();
   buildStoresTable();
+}
+
+
+function buildOperationalTotalizers() {
+  const container = document.getElementById('operationalTotalizers');
+  if (!container) return;
+
+  const growth = ((EVOLUCAO_DIARIA_CAMPANHA[1].Dentro.clientes - EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) / EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) * 100;
+  const periodTotals = getOperationalPeriodTotals();
+
+  const scopeRows = selectedStore
+    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore)
+    : [];
+
+  const scopeTotals = selectedStore
+    ? scopeRows.reduce((acc, row) => ({
+        vendasApp: acc.vendasApp + row.vendasApp,
+        vendasTotais: acc.vendasTotais + row.vendasTotais,
+        clientesParticipantes: acc.clientesParticipantes + row.clientes,
+        clientesSemApp: acc.clientesSemApp + row.clientesSemApp
+      }), {
+        vendasApp: 0,
+        vendasTotais: 0,
+        clientesParticipantes: 0,
+        clientesSemApp: 0
+      })
+    : periodTotals;
+
+  const participation = scopeTotals.clientesParticipantes + scopeTotals.clientesSemApp > 0
+    ? (scopeTotals.clientesParticipantes / (scopeTotals.clientesParticipantes + scopeTotals.clientesSemApp)) * 100
+    : TOTAIS.participacaoApp;
+
+  const scopeLabel = selectedStore ? selectedStore : '13/03 a 18/03';
+
+  const cards = [
+    { cls: 'kpi-purple', icon: 'fa-cart-shopping', label: 'Vendas app', value: fmt(scopeTotals.vendasApp), sub: `recorte: ${scopeLabel}` },
+    { cls: 'kpi-green', icon: 'fa-store', label: 'Vendas totais', value: fmt(scopeTotals.vendasTotais), sub: `recorte: ${scopeLabel}` },
+    { cls: 'kpi-orange', icon: 'fa-users', label: 'Compraram pelo app', value: fmt(scopeTotals.clientesParticipantes), sub: `${fmtPct(participation, 2)} no recorte` },
+    { cls: 'kpi-pink', icon: 'fa-user-xmark', label: 'Clientes sem app', value: fmt(scopeTotals.clientesSemApp), sub: selectedStore ? 'loja selecionada' : `crescimento diário ${fmtPct(growth, 1)}` }
+  ];
+
+  container.innerHTML = cards.map(card => `
+    <div class="kpi-card ${card.cls}">
+      <div class="kpi-icon"><i class="fas ${card.icon}"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-label">${card.label}</span>
+        <span class="kpi-value">${card.value}</span>
+        <span class="kpi-sub">${card.sub}</span>
+      </div>
+    </div>
+  `).join('');
 }
 
 function buildChartOperacional() {
@@ -340,8 +486,8 @@ function buildChartOperacional() {
       labels: series.labels,
       datasets: [
         {
-          label: 'Clientes — Dentro',
-          data: series.dentroClientes,
+          label: 'Compraram',
+          data: series.totalClientes,
           borderColor: PALETA.lilac,
           backgroundColor: PALETA.lilacBg,
           borderWidth: 3,
@@ -354,8 +500,8 @@ function buildChartOperacional() {
           fill: false
         },
         {
-          label: 'Clientes — Fora',
-          data: series.foraClientes,
+          label: 'Compraram pelo app',
+          data: series.clientesApp,
           borderColor: PALETA.pink,
           backgroundColor: PALETA.pinkBg,
           borderWidth: 3,
@@ -368,13 +514,13 @@ function buildChartOperacional() {
           fill: false
         },
         {
-          label: 'Qtd — Dentro',
-          data: series.dentroQtd,
-          borderColor: PALETA.mint,
-          backgroundColor: PALETA.mintBg,
+          label: 'Vendas totais',
+          data: series.totalVendas,
+          borderColor: PALETA.choco,
+          backgroundColor: PALETA.chocoBg,
           borderWidth: 2,
           pointRadius: 3,
-          pointBackgroundColor: PALETA.mint,
+          pointBackgroundColor: PALETA.choco,
           pointBorderColor: '#fff',
           pointBorderWidth: 2,
           cubicInterpolationMode: 'monotone',
@@ -383,8 +529,8 @@ function buildChartOperacional() {
           fill: false
         },
         {
-          label: 'Qtd — Fora',
-          data: series.foraQtd,
+          label: 'Cupons na campanha',
+          data: series.appCupons,
           borderColor: PALETA.orange,
           backgroundColor: PALETA.orangeBg,
           borderWidth: 2,
@@ -434,17 +580,24 @@ function buildDonutParticipacao() {
   const legend = document.getElementById('operacionalLegend');
   if (!ctx || !legend) return;
 
-  const value = TOTAIS.clientesDentro;
-  const remainder = TOTAIS.clientesForaBase;
-  const pct = (value / TOTAIS.clientesTotalBase) * 100;
+  const periodTotals = getOperationalPeriodTotals();
+  const value = selectedStore
+    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore).reduce((sum, row) => sum + row.clientes, 0)
+    : periodTotals.clientesParticipantes;
+  const remainder = selectedStore
+    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore).reduce((sum, row) => sum + row.clientesSemApp, 0)
+    : periodTotals.clientesSemApp;
+  const total = value + remainder;
+  const pct = total > 0 ? (value / total) * 100 : 0;
 
   chartInstances.chartOpParticipacao = new Chart(ctx, {
     type: 'doughnut',
+    plugins: [getDonutCenterPlugin(fmtPct(pct, 1))],
     data: {
-      labels: ['Dentro', 'Fora'],
+      labels: ['Compraram pelo app', 'Clientes sem app'],
       datasets: [{
         data: [value, remainder],
-        backgroundColor: [PALETA.lilac, '#f5ead8'],
+        backgroundColor: [PALETA.cream, PALETA.lilac],
         borderColor: ['#fff', '#fff'],
         borderWidth: 3,
         hoverOffset: 8
@@ -459,7 +612,7 @@ function buildDonutParticipacao() {
         tooltip: {
           backgroundColor: 'rgba(61,26,0,0.9)',
           callbacks: {
-            label: ctx => ` ${fmt(ctx.parsed)} clientes`
+            label: ctx => ` ${fmt(ctx.parsed)} clientes (${fmtPct((ctx.parsed / total) * 100, 1)})`
           }
         }
       }
@@ -467,8 +620,8 @@ function buildDonutParticipacao() {
   });
 
   legend.innerHTML = `
-    <span class="dot dot-purple"></span><span>Dentro <strong>${fmtPct(pct, 1)}</strong></span>
-    <span class="dot dot-cream"></span><span>Fora <strong>${fmtPct(100 - pct, 1)}</strong></span>
+    <span class="dot dot-purple"></span><span>Compraram pelo app <strong>${fmt(value)}</strong></span>
+    <span class="dot dot-cream"></span><span>Clientes sem app <strong>${fmt(remainder)}</strong></span>
   `;
 }
 
@@ -476,35 +629,105 @@ function buildDailyCampaignTable() {
   const tbody = document.getElementById('dailyCampaignTableBody');
   if (!tbody) return;
 
+  const total = getOperationalPeriodTotals();
+
+  const totalPct = total.clientesTotais > 0
+    ? (total.clientesParticipantes / total.clientesTotais) * 100
+    : 0;
+
   tbody.innerHTML = EVOLUCAO_DIARIA_CAMPANHA.map(d => `
     <tr>
       <td><strong>${d.data}</strong></td>
       <td>${fmt(d.Dentro.qtd)}</td>
       <td>${fmt(d.Dentro.tickets)}</td>
       <td>${fmt(d.Dentro.clientes)}</td>
-      <td>${fmt(d.Fora.qtd)}</td>
-      <td>${fmt(d.Fora.tickets)}</td>
-      <td>${fmt(d.Fora.clientes)}</td>
       <td><strong>${fmt(d.Total.qtd)}</strong></td>
       <td><strong>${fmt(d.Total.tickets)}</strong></td>
       <td><strong>${fmt(d.Total.clientes)}</strong></td>
+      <td>${fmt(d.Fora.clientes)}</td>
+      <td>${fmtPct((d.Dentro.clientes / d.Total.clientes) * 100, 1)}</td>
     </tr>
-  `).join('');
+  `).join('') + `
+    <tr class="table-total-row">
+      <td><strong>Total</strong></td>
+      <td><strong>${fmt(total.vendasApp)}</strong></td>
+      <td><strong>${fmt(total.appCupons)}</strong></td>
+      <td><strong>${fmt(total.clientesParticipantes)}</strong></td>
+      <td><strong>${fmt(total.vendasTotais)}</strong></td>
+      <td><strong>${fmt(total.cuponsTotais)}</strong></td>
+      <td><strong>${fmt(total.clientesTotais)}</strong></td>
+      <td><strong>${fmt(total.clientesSemApp)}</strong></td>
+      <td><strong>${fmtPct(totalPct, 1)}</strong></td>
+    </tr>
+  `;
+}
+
+function initStoreFilter() {
+  const select = document.getElementById('storeFilter');
+  const clearButton = document.getElementById('clearStoreFilter');
+  if (!select) return;
+
+  const options = ['<option value="">Todas as lojas</option>']
+    .concat(LOJAS_OPERACIONAL.map(row => `<option value="${row.loja}">${row.loja}</option>`));
+
+  select.innerHTML = options.join('');
+  select.value = selectedStore;
+  select.onchange = () => {
+    selectedStore = select.value;
+    buildOperationalTotalizers();
+    buildDonutParticipacao();
+    buildStoresTable();
+  };
+
+  if (clearButton) {
+    clearButton.onclick = () => {
+      selectedStore = '';
+      select.value = '';
+      buildOperationalTotalizers();
+      buildDonutParticipacao();
+      buildStoresTable();
+    };
+  }
 }
 
 function buildStoresTable() {
   const tbody = document.getElementById('storesTableBody');
   if (!tbody) return;
 
-  tbody.innerHTML = RANKING_LOJAS_DENTRO.map((row, i) => `
+  const filteredRows = selectedStore
+    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore)
+    : LOJAS_OPERACIONAL;
+
+  const totals = filteredRows.reduce((acc, row) => ({
+    vendasApp: acc.vendasApp + row.vendasApp,
+    vendasTotais: acc.vendasTotais + row.vendasTotais,
+    clientes: acc.clientes + row.clientes,
+    clientesSemApp: acc.clientesSemApp + row.clientesSemApp
+  }), {
+    vendasApp: 0,
+    vendasTotais: 0,
+    clientes: 0,
+    clientesSemApp: 0
+  });
+
+  tbody.innerHTML = filteredRows.map((row, i) => `
     <tr>
       <td class="rank-num">${i + 1}</td>
       <td><strong>${row.loja}</strong></td>
-      <td>${fmt(row.qtd)}</td>
-      <td>${fmt(row.tickets)}</td>
+      <td>${fmt(row.vendasApp)}</td>
+      <td>${fmt(row.vendasTotais)}</td>
       <td>${fmt(row.clientes)}</td>
+      <td>${fmt(row.clientesSemApp)}</td>
     </tr>
-  `).join('');
+  `).join('') + `
+    <tr class="table-total-row">
+      <td colspan="2"><strong>${selectedStore ? 'Total da loja' : 'Total consolidado'}</strong></td>
+      <td><strong>${fmt(totals.vendasApp)}</strong></td>
+      <td><strong>${fmt(totals.vendasTotais)}</strong></td>
+      <td><strong>${fmt(totals.clientes)}</strong></td>
+      <td><strong>${fmt(totals.clientesSemApp)}</strong></td>
+    </tr>
+  `;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -536,9 +759,9 @@ function buildRankingChart(metric) {
 
   const colors = [
     PALETA.lilac, PALETA.pink, PALETA.orange, PALETA.caramel,
-    PALETA.mint, PALETA.choco,
+    PALETA.orange, PALETA.choco,
     'rgba(232,160,32,0.6)', 'rgba(211,84,0,0.6)', 'rgba(230,126,34,0.6)',
-    'rgba(39,174,96,0.5)', 'rgba(123,63,26,0.5)', 'rgba(232,160,32,0.4)',
+    'rgba(156,90,26,0.35)', 'rgba(123,63,26,0.5)', 'rgba(232,160,32,0.4)',
     'rgba(211,84,0,0.4)'
   ];
 
@@ -547,7 +770,7 @@ function buildRankingChart(metric) {
     data: {
       labels,
       datasets: [{
-        label: metric === 'itens' ? 'Quantidade Vendida' : 'Clientes Únicos',
+        label: metric === 'itens' ? 'Vendas app' : 'Compraram pelo app',
         data: values,
         backgroundColor: colors.slice(0, values.length),
         borderRadius: 8,
@@ -657,7 +880,7 @@ function buildProductsGrid(data) {
       </div>
 
       <span class="pc-status ${p.soldDentro ? 'active' : 'inactive'}">
-        ${p.soldDentro ? `✓ ${fmt(p.itens)} itens na campanha` : 'Sem venda dentro'}
+        ${p.soldDentro ? `✓ ${fmt(p.itens)} vendas app` : 'Sem vendas app'}
       </span>
     </div>
   `).join('');
@@ -672,7 +895,7 @@ function buildProdTable(data) {
       <td><code style="font-size:0.78rem;color:var(--choco-light)">${p.id}</code></td>
       <td><strong>${p.name}</strong></td>
       <td>R$ ${fmtR(p.priceOriginal)}</td>
-      <td style="color:var(--mint);font-weight:700">R$ ${fmtR(p.priceOffer)}</td>
+      <td style="color:var(--orange);font-weight:700">R$ ${fmtR(p.priceOffer)}</td>
       <td>
         <span style="background:var(--pink-light);color:var(--pink);padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.78rem">
           -${p.discount}%
@@ -680,7 +903,7 @@ function buildProdTable(data) {
       </td>
       <td>
         <span class="${p.soldDentro ? 'badge-within' : 'badge-outside'}">
-          ${p.soldDentro ? `✓ ${fmt(p.itens)} itens` : 'Sem venda dentro'}
+          ${p.soldDentro ? `✓ ${fmt(p.itens)} vendas app` : 'Sem vendas app'}
         </span>
       </td>
     </tr>
@@ -778,16 +1001,16 @@ function buildCRMFunnel() {
   chartInstances.chartCRMFunil = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Base Total', 'Fora', 'Dentro'],
+      labels: ['Base total', 'Clientes não participantes', 'Clientes participantes'],
       datasets: [{
         label: 'Clientes',
         data: [
           TOTAIS.clientesTotalBase,
-          TOTAIS.clientesForaBase,
-          TOTAIS.clientesDentro
+          TOTAIS.clientesNaoParticipantes,
+          TOTAIS.clientesParticipantes
         ],
-        backgroundColor: [PALETA.caramelBg, '#f5ead8', PALETA.lilac],
-        borderColor: [PALETA.caramel, '#d9cdbd', PALETA.lilac],
+        backgroundColor: [PALETA.caramelBg, '#f5ead8', PALETA.pinkBg],
+        borderColor: [PALETA.caramel, '#d9cdbd', PALETA.pink],
         borderWidth: 2,
         borderRadius: 8,
         borderSkipped: false
@@ -826,19 +1049,19 @@ function buildCRMDayTable() {
 
   tbody.innerHTML = EVOLUCAO_DIARIA_GERAL.map(d => {
     const campanha = dailyMap[d.data];
-    const dentro = campanha ? campanha.Dentro.clientes : 0;
-    const fora = campanha ? campanha.Fora.clientes : d.clientes;
-    const pct = d.clientes > 0 ? (dentro / d.clientes) * 100 : 0;
+    const participantes = campanha ? campanha.Dentro.clientes : 0;
+    const naoParticipantes = campanha ? campanha.Fora.clientes : d.clientes;
+    const pct = d.clientes > 0 ? (participantes / d.clientes) * 100 : 0;
 
     return `
       <tr>
         <td><strong>${d.data}</strong></td>
         <td>${fmt(d.clientes)}</td>
-        <td style="color:var(--caramel);font-weight:700">${fmt(dentro)}</td>
-        <td>${fmt(fora)}</td>
+        <td style="color:var(--caramel);font-weight:700">${fmt(participantes)}</td>
+        <td>${fmt(naoParticipantes)}</td>
         <td>
           ${
-            dentro > 0
+            participantes > 0
               ? `<span style="background:var(--lilac);color:#fff;padding:2px 8px;border-radius:10px;font-size:0.76rem;font-weight:700">${fmtPct(pct, 1)}</span>`
               : '<span style="color:#ccc;font-size:0.76rem">0,0%</span>'
           }
@@ -856,7 +1079,7 @@ function buildCRMInsights() {
     ((EVOLUCAO_DIARIA_CAMPANHA[1].Dentro.clientes - EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) /
       EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) * 100;
 
-  const topStore = RANKING_LOJAS_DENTRO[0];
+  const topStore = LOJAS_OPERACIONAL[0];
   const topProduct = RANKING_DENTRO[0];
 
   const insights = [
@@ -864,19 +1087,19 @@ function buildCRMInsights() {
       icon: 'fas fa-arrow-trend-up',
       type: 'good',
       title: 'Crescimento forte entre 13/03 e 14/03',
-      text: `Clientes Dentro cresceram ${fmtPct(growth, 1)} no comparativo diário.`
+      text: `Clientes participantes cresceram ${fmtPct(growth, 1)} no comparativo diário.`
     },
     {
       icon: 'fas fa-percent',
       type: 'info',
       title: 'Participação atual da campanha',
-      text: `A campanha representa ${fmtPct(TOTAIS.participacao, 2)} da base estimada de clientes.`
+      text: `${fmtPct(TOTAIS.participacaoApp, 2)} da base já comprou pelo app.`
     },
     {
       icon: 'fas fa-store',
       type: 'good',
       title: 'Loja líder na campanha',
-      text: `${topStore.loja} lidera com ${fmt(topStore.qtd)} itens, ${fmt(topStore.tickets)} tickets e ${fmt(topStore.clientes)} clientes.`
+      text: `${topStore.loja} lidera com ${fmt(topStore.vendasApp)} vendas app e ${fmt(topStore.clientesSemApp)} clientes sem app estimados.`
     },
     {
       icon: 'fas fa-egg',
@@ -888,13 +1111,13 @@ function buildCRMInsights() {
       icon: 'fas fa-box-open',
       type: 'info',
       title: 'Cobertura de itens da campanha',
-      text: `${fmt(TOTAIS.produtosDentro)} dos ${fmt(TOTAIS.produtosCampanha)} produtos já tiveram venda com status Dentro.`
+      text: `${fmt(TOTAIS.produtosApp)} dos ${fmt(TOTAIS.produtosCampanha)} produtos já tiveram vendas app.`
     },
     {
       icon: 'fas fa-users-slash',
       type: 'alert',
-      title: 'Clientes fora da campanha',
-      text: `Ainda existem ${fmt(TOTAIS.clientesForaBase)} clientes fora, o que mostra espaço para ampliar adesão.`
+      title: 'Clientes não participantes',
+      text: `Ainda existem ${fmt(TOTAIS.clientesNaoParticipantes)} clientes que não compraram pelo app.`
     }
   ];
 
@@ -913,6 +1136,7 @@ function buildCRMInsights() {
 //  INIT
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
+  initMobileMenu();
   initNav();
   renderVisaoGeral();
   animateCounters();
