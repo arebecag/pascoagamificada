@@ -1076,11 +1076,36 @@ body {
   .kpi-row {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .charts-row-geral,
+  .charts-row-op,
+  .podio-row {
+    grid-template-columns: 1fr;
+  }
+
+  .podio-row .podio-grid {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .podio-row .podio-item {
+    width: min(260px, 100%);
+  }
 }
 
 @media (max-width: 800px) {
   :root {
     --sidebar-w: 0px;
+  }
+
+  body {
+    overflow: auto;
+  }
+
+  .app-wrapper {
+    display: block;
+    height: auto;
+    min-height: calc(100dvh - 48px);
   }
 
   .sidebar {
@@ -1090,30 +1115,54 @@ body {
   .main-content {
     margin-left: 0;
     padding: 1rem;
+    height: auto;
+    overflow: visible;
   }
 
-  .charts-row-geral,
-  .charts-row-op {
+  .page-section.active,
+  .page-section.active:not(#visao-geral) {
+    height: auto;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .kpi-row {
     grid-template-columns: 1fr;
   }
 
+  .charts-row-geral,
+  .charts-row-op,
   .podio-row {
     grid-template-columns: 1fr;
   }
 
-  .podio-row .podio-section {
+  .chart-card,
+  .podio-row .podio-section,
+  .rank-table-wrap {
     padding: 0.85rem;
   }
 
+  .chart-body,
+  #visao-geral .chart-card-wide .chart-body {
+    height: 220px !important;
+  }
+
+  .podio-row .podio-grid,
   .podio-grid {
     justify-content: center;
-    max-width: 280px;
+    align-items: stretch;
+    flex-wrap: wrap;
+    max-width: 100%;
     margin: 0 auto;
   }
 
-  .podio-row .podio-item {
+  .podio-item,
+  .podio-row .podio-item,
+  .store-podium-grid .podio-item {
     width: 100%;
-    max-width: 280px;
+    max-width: none;
+    min-height: auto;
+    transform: none !important;
   }
 
   #visao-geral.active {
@@ -1144,6 +1193,18 @@ body {
   .store-filter-clear {
     width: 100%;
     min-width: 0;
+  }
+
+  .rank-table,
+  .loja-table {
+    font-size: 0.76rem;
+  }
+
+  .rank-table thead th,
+  .loja-table thead th,
+  .rank-table tbody td,
+  .loja-table tbody td {
+    padding: 7px 8px;
   }
 
   .chart-header-with-actions {
