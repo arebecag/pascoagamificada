@@ -28,8 +28,8 @@ const TOTAIS = {
   clientesTotalBase: 45800,
   clientesNaoParticipantes: 40304,
   clientesCompraramCampanha: 44662,
-  clientesComAppInstalado: 5496,
-  clientesSemAppInstalado: 39166,
+  clientesComAppInstalado: 34097,
+  clientesSemAppInstalado: 10565,
   viewsCampanha: 44662,
   scanSuccess: 5496,
   gamificacaoAbriuJogo: 16752,
@@ -412,7 +412,7 @@ const LOJAS_OPERACIONAL = (() => {
       ...row,
       vendasApp: row.qtd,
       vendasTotais,
-      cpfsNaoParticipantes: naoParticipantes,
+      clientesSemApp: naoParticipantes,
       shareClientesApp: totalClientesApp > 0 ? row.clientes / totalClientesApp : 0
     };
   });

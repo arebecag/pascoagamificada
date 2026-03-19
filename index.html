@@ -105,29 +105,29 @@
 
         <div class="kpi-row kpi-row-geral">
           <div class="kpi-card kpi-purple kpi-card-highlight">
-            <div class="kpi-icon"><i class="fas fa-gamepad"></i></div>
+            <div class="kpi-icon"><i class="fas fa-mobile-screen-button"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Clientes abriram o jogo</span>
-              <span class="kpi-value" data-count="16752">0</span>
-              <span class="kpi-sub">acumulado da gamificação</span>
+              <span class="kpi-label">Cliente Com APP</span>
+              <span class="kpi-value" data-count="34097">0</span>
+              <span class="kpi-sub">clientes da campanha com app identificado</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-green">
             <div class="kpi-icon"><i class="fas fa-mobile-screen-button"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Abriu scan</span>
-              <span class="kpi-value" data-count="329">0</span>
-              <span class="kpi-sub">2,0% de quem abriu o jogo</span>
+              <span class="kpi-label">Cupons na Campanha</span>
+              <span class="kpi-value" data-count="5926">0</span>
+              <span class="kpi-sub">cupons com itens da campanha</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-orange">
             <div class="kpi-icon"><i class="fas fa-qrcode"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Escaneou</span>
-              <span class="kpi-value" data-count="313">0</span>
-              <span class="kpi-sub">95,1% de scan success</span>
+              <span class="kpi-label">Qtd Vendida</span>
+              <span class="kpi-value" data-count="8808">0</span>
+              <span class="kpi-sub">itens vendidos pelo app</span>
             </div>
           </div>
 
@@ -154,7 +154,7 @@
           <div class="chart-card chart-card-wide">
            <div class="chart-header">
   <h3><i class="fas fa-chart-line"></i> Evolução Diária — Campanha</h3>
-  <p class="chart-sub">Comparativo diário de 01/03 a 18/03 — Compraram vs Compraram pelo app</p>
+  <p class="chart-sub">Comparativo diário de 01/03 a 18/03 — compraram vs compraram pelo app</p>
 </div>
 
             <div class="chart-body" style="height:260px">
@@ -164,15 +164,15 @@
 
           <div class="chart-card chart-card-narrow">
             <div class="chart-header">
-              <h3><i class="fas fa-circle-half-stroke"></i> Abertura de scan no jogo</h3>
-              <p class="chart-sub">Dos clientes que abriram o jogo, quantos abriram o scan</p>
+              <h3><i class="fas fa-circle-half-stroke"></i> App na base compradora</h3>
+              <p class="chart-sub">Entre os clientes da campanha, quantos têm app identificado</p>
             </div>
             <div class="chart-body chart-center-body" style="height:200px">
               <canvas id="chartDonutClientes"></canvas>
             </div>
             <div class="donut-legend">
-              <span class="dot dot-purple"></span><span>Abriu scan <strong>329</strong></span>
-              <span class="dot dot-cream"></span><span>Não abriu scan <strong>16.423</strong></span>
+              <span class="dot dot-purple"></span><span>Cliente Com APP <strong>34.097</strong></span>
+              <span class="dot dot-cream"></span><span>Cliente Sem APP <strong>10.565</strong></span>
             </div>
           </div>
         </div>
@@ -203,7 +203,7 @@
       <section class="page-section" id="visao-operacional">
         <div class="section-page-header">
           <h2><i class="fas fa-store"></i> Visão Operacional</h2>
-          <p>Resumo executivo das vendas app e total por loja</p>
+          <p>Resumo executivo da campanha com foco em app, clientes e vendas por loja</p>
         </div>
 
         <div class="kpi-row operational-totalizers" id="operationalTotalizers"></div>
@@ -212,8 +212,8 @@
           <div class="chart-card chart-card-wide">
             <div class="chart-header">
               <div>
-                <h3><i class="fas fa-chart-line"></i> Vendas totais vs vendas app</h3>
-                <p class="chart-sub">Linhas curvas com comparação diária de clientes e vendas</p>
+                <h3><i class="fas fa-chart-line"></i> Clientes e vendas por dia</h3>
+                <p class="chart-sub">Comparativo diário de clientes, cupons e vendas da campanha</p>
               </div>
             </div>
             <div class="chart-body" style="height:250px">
@@ -223,7 +223,7 @@
 
           <div class="chart-card chart-card-narrow">
             <div class="chart-header">
-              <h3><i class="fas fa-percent"></i> Funil de scan</h3>
+              <h3><i class="fas fa-percent"></i> Participação de clientes app</h3>
             </div>
             <div class="chart-body chart-center-body" style="height:200px">
               <canvas id="chartOpParticipacao"></canvas>
@@ -233,7 +233,7 @@
         </div>
 
         <div class="section-title-bar" style="margin-top:2rem">
-          <h2>📅 Resumo diário — Compraram, compraram pelo app e vendas</h2>
+          <h2>📅 Resumo diário — clientes, cupons e vendas da campanha</h2>
         </div>
 
         <div class="table-scroll">
@@ -247,7 +247,7 @@
                 <th>Vendas totais</th>
                 <th>Cupons totais</th>
                 <th>Compraram</th>
-                <th>Clientes não participantes</th>
+                <th>Clientes sem app</th>
                 <th>% app</th>
               </tr>
             </thead>
@@ -256,7 +256,7 @@
         </div>
 
         <div class="section-title-bar section-title-with-filter" style="margin-top:2rem">
-          <h2>🏬 Lojas — vendas app, vendas totais e CPFs não participantes</h2>
+          <h2>🏬 Lojas — vendas app, vendas totais e clientes sem app</h2>
           <div class="store-filter-wrap">
             <label for="storeFilter">Loja</label>
             <div class="store-filter-controls">
@@ -277,7 +277,7 @@
                 <th>Vendas app</th>
                 <th>Vendas totais</th>
                 <th>Compraram pelo app</th>
-                <th>CPFs não participantes</th>
+                <th>Clientes sem app</th>
               </tr>
             </thead>
             <tbody id="storesTableBody"></tbody>
@@ -440,7 +440,7 @@
                 <th>Data</th>
                 <th>Total Clientes</th>
                 <th>Compraram pelo app</th>
-                <th>Clientes não participantes</th>
+                <th>Clientes sem app</th>
                 <th>% app</th>
               </tr>
             </thead>
