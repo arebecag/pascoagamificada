@@ -1014,12 +1014,6 @@ function buildCRMDayTable() {
       pctEtapa: (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100,
       pctJogo: (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuJogo) * 100
     },
-    {
-      etapa: 'Completou',
-      clientes: TOTAIS.gamificacaoCompletou,
-      pctEtapa: (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoEscaneou) * 100,
-      pctJogo: (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoAbriuJogo) * 100
-    }
   ];
 
   tbody.innerHTML = rows.map(row => `
@@ -1038,8 +1032,6 @@ function buildCRMInsights() {
 
   const pctAbriuScan = (TOTAIS.gamificacaoAbriuScan / TOTAIS.gamificacaoAbriuJogo) * 100;
   const pctEscaneou = (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100;
-  const pctCompletouScan = (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoEscaneou) * 100;
-  const pctCompletouJogo = (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoAbriuJogo) * 100;
 
   const insights = [
     {
@@ -1060,18 +1052,6 @@ function buildCRMInsights() {
       title: 'Scan success muito alto',
       text: `${fmtPct(pctEscaneou, 2)} de quem abriu scan conseguiu escanear.`
     },
-    {
-      icon: 'fas fa-flag-checkered',
-      type: 'alert',
-      title: 'Conclusão final da jornada',
-      text: `${fmt(TOTAIS.gamificacaoCompletou)} clientes completaram a jornada, ou ${fmtPct(pctCompletouJogo, 2)} de quem abriu o jogo.`
-    },
-    {
-      icon: 'fas fa-bullseye',
-      type: 'info',
-      title: 'Conversão após o scan',
-      text: `${fmtPct(pctCompletouScan, 2)} de quem escaneou chegou até a conclusão.`
-    }
   ];
 
   container.innerHTML = insights.map(card => `
