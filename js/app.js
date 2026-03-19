@@ -371,6 +371,27 @@ function buildDonutCampanha() {
 // ═══════════════════════════════════════════════════════════════
 //  VISÃO OPERACIONAL
 // ═══════════════════════════════════════════════════════════════
+
+function getOperationalPeriodTotals() {
+  return EVOLUCAO_DIARIA_CAMPANHA.reduce((acc, day) => ({
+    vendasApp: acc.vendasApp + day.Dentro.qtd,
+    appCupons: acc.appCupons + day.Dentro.tickets,
+    clientesParticipantes: acc.clientesParticipantes + day.Dentro.clientes,
+    vendasTotais: acc.vendasTotais + day.Total.qtd,
+    cuponsTotais: acc.cuponsTotais + day.Total.tickets,
+    clientesTotais: acc.clientesTotais + day.Total.clientes,
+    cpfsNaoParticipantes: acc.cpfsNaoParticipantes + day.Fora.clientes
+  }), {
+    vendasApp: 0,
+    appCupons: 0,
+    clientesParticipantes: 0,
+    vendasTotais: 0,
+    cuponsTotais: 0,
+    clientesTotais: 0,
+    cpfsNaoParticipantes: 0
+  });
+}
+
 function renderVisaoOperacional() {
   buildOperationalTotalizers();
   buildChartOperacional();
@@ -386,27 +407,31 @@ function buildOperationalTotalizers() {
   if (!container) return;
 
   const growth = ((EVOLUCAO_DIARIA_CAMPANHA[1].Dentro.clientes - EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) / EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) * 100;
+  const periodTotals = getOperationalPeriodTotals();
+
   const scopeRows = selectedStore
     ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore)
-    : LOJAS_OPERACIONAL;
+    : [];
 
-  const scopeTotals = scopeRows.reduce((acc, row) => ({
-    vendasApp: acc.vendasApp + row.vendasApp,
-    vendasTotais: acc.vendasTotais + row.vendasTotais,
-    clientesParticipantes: acc.clientesParticipantes + row.clientes,
-    cpfsNaoParticipantes: acc.cpfsNaoParticipantes + row.cpfsNaoParticipantes
-  }), {
-    vendasApp: 0,
-    vendasTotais: 0,
-    clientesParticipantes: 0,
-    cpfsNaoParticipantes: 0
-  });
+  const scopeTotals = selectedStore
+    ? scopeRows.reduce((acc, row) => ({
+        vendasApp: acc.vendasApp + row.vendasApp,
+        vendasTotais: acc.vendasTotais + row.vendasTotais,
+        clientesParticipantes: acc.clientesParticipantes + row.clientes,
+        cpfsNaoParticipantes: acc.cpfsNaoParticipantes + row.cpfsNaoParticipantes
+      }), {
+        vendasApp: 0,
+        vendasTotais: 0,
+        clientesParticipantes: 0,
+        cpfsNaoParticipantes: 0
+      })
+    : periodTotals;
 
   const participation = scopeTotals.clientesParticipantes + scopeTotals.cpfsNaoParticipantes > 0
     ? (scopeTotals.clientesParticipantes / (scopeTotals.clientesParticipantes + scopeTotals.cpfsNaoParticipantes)) * 100
     : TOTAIS.participacaoApp;
 
-  const scopeLabel = selectedStore ? selectedStore : 'todas as lojas';
+  const scopeLabel = selectedStore ? selectedStore : '13/03 a 18/03';
 
   const cards = [
     { cls: 'kpi-purple', icon: 'fa-cart-shopping', label: 'Vendas app', value: fmt(scopeTotals.vendasApp), sub: `recorte: ${scopeLabel}` },
@@ -576,26 +601,10 @@ function buildDailyCampaignTable() {
   const tbody = document.getElementById('dailyCampaignTableBody');
   if (!tbody) return;
 
-  const total = EVOLUCAO_DIARIA_CAMPANHA.reduce((acc, d) => ({
-    appVendas: acc.appVendas + d.Dentro.qtd,
-    appCupons: acc.appCupons + d.Dentro.tickets,
-    clientesApp: acc.clientesApp + d.Dentro.clientes,
-    vendasTotais: acc.vendasTotais + d.Total.qtd,
-    cuponsTotais: acc.cuponsTotais + d.Total.tickets,
-    clientesTotais: acc.clientesTotais + d.Total.clientes,
-    clientesNaoParticipantes: acc.clientesNaoParticipantes + d.Fora.clientes
-  }), {
-    appVendas: 0,
-    appCupons: 0,
-    clientesApp: 0,
-    vendasTotais: 0,
-    cuponsTotais: 0,
-    clientesTotais: 0,
-    clientesNaoParticipantes: 0
-  });
+  const total = getOperationalPeriodTotals();
 
   const totalPct = total.clientesTotais > 0
-    ? (total.clientesApp / total.clientesTotais) * 100
+    ? (total.clientesParticipantes / total.clientesTotais) * 100
     : 0;
 
   tbody.innerHTML = EVOLUCAO_DIARIA_CAMPANHA.map(d => `
@@ -613,13 +622,13 @@ function buildDailyCampaignTable() {
   `).join('') + `
     <tr class="table-total-row">
       <td><strong>Total</strong></td>
-      <td><strong>${fmt(total.appVendas)}</strong></td>
+      <td><strong>${fmt(total.vendasApp)}</strong></td>
       <td><strong>${fmt(total.appCupons)}</strong></td>
-      <td><strong>${fmt(total.clientesApp)}</strong></td>
+      <td><strong>${fmt(total.clientesParticipantes)}</strong></td>
       <td><strong>${fmt(total.vendasTotais)}</strong></td>
       <td><strong>${fmt(total.cuponsTotais)}</strong></td>
       <td><strong>${fmt(total.clientesTotais)}</strong></td>
-      <td><strong>${fmt(total.clientesNaoParticipantes)}</strong></td>
+      <td><strong>${fmt(total.cpfsNaoParticipantes)}</strong></td>
       <td><strong>${fmtPct(totalPct, 1)}</strong></td>
     </tr>
   `;
