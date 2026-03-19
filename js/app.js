@@ -226,8 +226,8 @@ function buildStorePodio() {
       <div class="podio-bar ${bars[i]}"></div>
       <div class="podio-info">
         <strong>${item.loja}</strong>
-        <span class="podio-qty">${fmt(item.vendasApp)} vendas app</span>
-        <span class="podio-clients">${fmt(item.clientesSemApp)} clientes sem app</span>
+        <span class="podio-qty">${fmt(item.cuponsVendas)} cupons vendas</span>
+        <span class="podio-clients">${fmt(item.clientesCampanha)} clientes da campanha</span>
       </div>
     </div>
   `).join('');
@@ -690,33 +690,29 @@ function buildStoresTable() {
     : LOJAS_OPERACIONAL;
 
   const totals = filteredRows.reduce((acc, row) => ({
-    vendasApp: acc.vendasApp + row.vendasApp,
-    vendasTotais: acc.vendasTotais + row.vendasTotais,
-    clientes: acc.clientes + row.clientes,
-    clientesSemApp: acc.clientesSemApp + row.clientesSemApp
+    clientesCampanha: acc.clientesCampanha + row.clientesCampanha,
+    clientesComApp: acc.clientesComApp + row.clientesComApp,
+    cuponsVendas: acc.cuponsVendas + row.cuponsVendas
   }), {
-    vendasApp: 0,
-    vendasTotais: 0,
-    clientes: 0,
-    clientesSemApp: 0
+    clientesCampanha: 0,
+    clientesComApp: 0,
+    cuponsVendas: 0
   });
 
   tbody.innerHTML = filteredRows.map((row, i) => `
     <tr>
       <td class="rank-num">${i + 1}</td>
       <td><strong>${row.loja}</strong></td>
-      <td>${fmt(row.vendasApp)}</td>
-      <td>${fmt(row.vendasTotais)}</td>
-      <td>${fmt(row.clientes)}</td>
-      <td>${fmt(row.clientesSemApp)}</td>
+      <td>${fmt(row.clientesCampanha)}</td>
+      <td>${fmt(row.clientesComApp)}</td>
+      <td>${fmt(row.cuponsVendas)}</td>
     </tr>
   `).join('') + `
     <tr class="table-total-row">
-      <td colspan="2"><strong>${selectedStore ? 'Total da loja' : 'Total consolidado'}</strong></td>
-      <td><strong>${fmt(totals.vendasApp)}</strong></td>
-      <td><strong>${fmt(totals.vendasTotais)}</strong></td>
-      <td><strong>${fmt(totals.clientes)}</strong></td>
-      <td><strong>${fmt(totals.clientesSemApp)}</strong></td>
+      <td colspan="2"><strong>${selectedStore ? 'Total da filial' : 'Total consolidado'}</strong></td>
+      <td><strong>${fmt(totals.clientesCampanha)}</strong></td>
+      <td><strong>${fmt(totals.clientesComApp)}</strong></td>
+      <td><strong>${fmt(totals.cuponsVendas)}</strong></td>
     </tr>
   `;
 }

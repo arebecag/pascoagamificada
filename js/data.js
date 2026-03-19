@@ -394,6 +394,9 @@ const PARTICIPATION_RATE = TOTAIS.clientesParticipantes / TOTAIS.clientesTotalBa
 const LOJAS_OPERACIONAL = (() => {
   const totalNaoParticipantes = TOTAIS.clientesNaoParticipantes;
   const totalClientesApp = RANKING_LOJAS_DENTRO.reduce((sum, row) => sum + row.clientes, 0);
+  const appCoverageRate = TOTAIS.clientesCompraramCampanha > 0
+    ? TOTAIS.clientesComAppInstalado / TOTAIS.clientesCompraramCampanha
+    : 0;
 
   let allocated = 0;
 
@@ -407,6 +410,8 @@ const LOJAS_OPERACIONAL = (() => {
       naoParticipantes = Math.max(0, totalNaoParticipantes - allocated);
     }
 
+    const clientesCampanha = row.clientes + naoParticipantes;
+    const clientesComApp = Math.round(clientesCampanha * appCoverageRate);
     const vendasTotais = row.qtd + naoParticipantes;
 
     return {
@@ -414,6 +419,9 @@ const LOJAS_OPERACIONAL = (() => {
       vendasApp: row.qtd,
       vendasTotais,
       clientesSemApp: naoParticipantes,
+      clientesCampanha,
+      clientesComApp,
+      cuponsVendas: vendasTotais,
       shareClientesApp: totalClientesApp > 0 ? row.clientes / totalClientesApp : 0
     };
   });
