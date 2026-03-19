@@ -24,6 +24,7 @@ const TOTAIS = {
   cuponsApp: 5926,
   vendasApp: 8808,
   lojasParticipantes: 67,
+  cuponsVendasCampanha: 74145,
   participacaoApp: 12,
   clientesTotalBase: 45800,
   clientesNaoParticipantes: 40304,

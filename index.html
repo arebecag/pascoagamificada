@@ -105,29 +105,29 @@
 
         <div class="kpi-row kpi-row-geral">
           <div class="kpi-card kpi-purple kpi-card-highlight">
-            <div class="kpi-icon"><i class="fas fa-mobile-screen-button"></i></div>
+            <div class="kpi-icon"><i class="fas fa-users"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Cliente Com APP</span>
-              <span class="kpi-value" data-count="34097">0</span>
-              <span class="kpi-sub">clientes da campanha com app identificado</span>
+              <span class="kpi-label">Clientes compraram produtos da campanha</span>
+              <span class="kpi-value" data-count="44662">0</span>
+              <span class="kpi-sub">total de clientes da campanha</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-green">
             <div class="kpi-icon"><i class="fas fa-mobile-screen-button"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Cupons na Campanha</span>
-              <span class="kpi-value" data-count="5926">0</span>
-              <span class="kpi-sub">cupons com itens da campanha</span>
+              <span class="kpi-label">Clientes com app</span>
+              <span class="kpi-value" data-count="34097">0</span>
+              <span class="kpi-sub">base com app identificado</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-orange">
-            <div class="kpi-icon"><i class="fas fa-qrcode"></i></div>
+            <div class="kpi-icon"><i class="fas fa-receipt"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Qtd Vendida</span>
-              <span class="kpi-value" data-count="8808">0</span>
-              <span class="kpi-sub">itens vendidos pelo app</span>
+              <span class="kpi-label">CUPONS VENDAS</span>
+              <span class="kpi-value" data-count="74145">0</span>
+              <span class="kpi-sub">volume total de vendas da campanha</span>
             </div>
           </div>
 
@@ -143,9 +143,9 @@
           <div class="kpi-card kpi-green">
             <div class="kpi-icon"><i class="fas fa-store"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Lojas com venda dos produtos da campanha</span>
+              <span class="kpi-label">Total de lojas ativas na campanha</span>
               <span class="kpi-value" data-count="67">0</span>
-              <span class="kpi-sub">lojas com vendas no período</span>
+              <span class="kpi-sub">lojas ativas no período</span>
             </div>
           </div>
         </div>
@@ -164,15 +164,17 @@
 
           <div class="chart-card chart-card-narrow">
             <div class="chart-header">
-              <h3><i class="fas fa-circle-half-stroke"></i> App na base compradora</h3>
-              <p class="chart-sub">Entre os clientes da campanha, quantos têm app identificado</p>
+              <h3><i class="fas fa-filter"></i> Funil da gamificação</h3>
+              <p class="chart-sub">Da abertura do jogo até a conclusão da jornada</p>
             </div>
             <div class="chart-body chart-center-body" style="height:200px">
               <canvas id="chartDonutClientes"></canvas>
             </div>
             <div class="donut-legend">
-              <span class="dot dot-purple"></span><span>Cliente Com APP <strong>34.097</strong></span>
-              <span class="dot dot-cream"></span><span>Cliente Sem APP <strong>10.565</strong></span>
+              <span class="dot dot-purple"></span><span>Abriu o jogo <strong>16.752</strong></span>
+              <span class="dot dot-orange"></span><span>Abriu scan <strong>329</strong></span>
+              <span class="dot dot-cream"></span><span>Escaneou <strong>313</strong></span>
+              <span class="dot dot-pink"></span><span>Completou <strong>18</strong></span>
             </div>
           </div>
         </div>
@@ -233,7 +235,7 @@
         </div>
 
         <div class="section-title-bar" style="margin-top:2rem">
-          <h2>📅 Resumo diário — clientes, cupons e vendas da campanha</h2>
+          <h2>📅 Resumo diário — tickets e CPF distintos por dia</h2>
         </div>
 
         <div class="table-scroll">
@@ -241,14 +243,8 @@
             <thead>
               <tr>
                 <th>Data</th>
-                <th>Vendas app</th>
-                <th>Cupons app</th>
-                <th>Compraram pelo app</th>
-                <th>Vendas totais</th>
-                <th>Cupons totais</th>
-                <th>Compraram</th>
-                <th>Clientes sem app</th>
-                <th>% app</th>
+                <th>Tickets</th>
+                <th>CPF distintos por dia</th>
               </tr>
             </thead>
             <tbody id="dailyCampaignTableBody"></tbody>
@@ -367,43 +363,43 @@
       <section class="page-section" id="operacional-crm">
         <div class="section-page-header">
           <h2><i class="fas fa-users-gear"></i> Operacional CRM</h2>
-          <p>Visão da base, evolução diária e cobertura da campanha</p>
+          <p>Visão da gamificação no CRM e avanço do funil do jogo</p>
         </div>
 
         <div class="kpi-row">
           <div class="kpi-card kpi-purple">
-            <div class="kpi-icon"><i class="fas fa-users"></i></div>
+            <div class="kpi-icon"><i class="fas fa-gamepad"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Base Total</span>
-              <span class="kpi-value" data-count="45800">0</span>
-              <span class="kpi-sub">clientes únicos estimados</span>
+              <span class="kpi-label">Abriu o jogo</span>
+              <span class="kpi-value" data-count="16752">0</span>
+              <span class="kpi-sub">clientes únicos da jornada</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-green">
-            <div class="kpi-icon"><i class="fas fa-user-check"></i></div>
+            <div class="kpi-icon"><i class="fas fa-mobile-screen-button"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Clientes participantes</span>
-              <span class="kpi-value" data-count="5496">0</span>
-              <span class="kpi-sub">compraram pelo app</span>
+              <span class="kpi-label">Abriu scan</span>
+              <span class="kpi-value" data-count="329">0</span>
+              <span class="kpi-sub">1,96% de quem abriu o jogo</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-orange">
-            <div class="kpi-icon"><i class="fas fa-user-xmark"></i></div>
+            <div class="kpi-icon"><i class="fas fa-qrcode"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Clientes não participantes</span>
-              <span class="kpi-value" data-count="40304">0</span>
-              <span class="kpi-sub">não compraram pelo app</span>
+              <span class="kpi-label">Escaneou</span>
+              <span class="kpi-value" data-count="313">0</span>
+              <span class="kpi-sub">95,14% de scan success</span>
             </div>
           </div>
 
           <div class="kpi-card kpi-pink">
-            <div class="kpi-icon"><i class="fas fa-link"></i></div>
+            <div class="kpi-icon"><i class="fas fa-flag-checkered"></i></div>
             <div class="kpi-info">
-              <span class="kpi-label">Produtos com vendas app</span>
-              <span class="kpi-value">13</span>
-              <span class="kpi-sub">produtos já ativados</span>
+              <span class="kpi-label">Completou</span>
+              <span class="kpi-value" data-count="18">0</span>
+              <span class="kpi-sub">5,75% de conclusão após scan</span>
             </div>
           </div>
         </div>
@@ -411,8 +407,8 @@
         <div class="charts-row-geral">
           <div class="chart-card chart-card-wide">
             <div class="chart-header">
-              <h3><i class="fas fa-chart-line"></i> Evolução Diária — Geral</h3>
-              <p class="chart-sub">Totais da planilha de 01/03 a 18/03</p>
+              <h3><i class="fas fa-chart-column"></i> Funil da gamificação</h3>
+              <p class="chart-sub">Etapas acumuladas da jornada no CRM</p>
             </div>
             <div class="chart-body" style="height:250px">
               <canvas id="chartCRMDiario"></canvas>
@@ -421,7 +417,7 @@
 
           <div class="chart-card chart-card-narrow">
             <div class="chart-header">
-              <h3><i class="fas fa-funnel-dollar"></i> Funil de Cobertura</h3>
+              <h3><i class="fas fa-circle-half-stroke"></i> Scan success</h3>
             </div>
             <div class="chart-body chart-center-body" style="height:220px">
               <canvas id="chartCRMFunil"></canvas>
@@ -430,18 +426,17 @@
         </div>
 
         <div class="section-title-bar" style="margin-top:2rem">
-          <h2>📅 Clientes por dia — compraram vs compraram pelo app</h2>
+          <h2>📅 Etapas do CRM — jogo, scan e conclusão</h2>
         </div>
 
         <div class="table-scroll">
           <table class="rank-table" id="crmDayTable">
             <thead>
               <tr>
-                <th>Data</th>
-                <th>Total Clientes</th>
-                <th>Compraram pelo app</th>
-                <th>Clientes sem app</th>
-                <th>% app</th>
+                <th>Etapa</th>
+                <th>Clientes</th>
+                <th>% etapa anterior</th>
+                <th>% do jogo</th>
               </tr>
             </thead>
             <tbody id="crmDayTableBody"></tbody>

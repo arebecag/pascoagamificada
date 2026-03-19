@@ -353,36 +353,45 @@ function buildDonutCampanha() {
   if (!ctx) return;
 
   chartInstances.chartDonutClientes = new Chart(ctx, {
-    type: 'doughnut',
-    plugins: [getDonutCenterPlugin(fmtPct((TOTAIS.clientesComAppInstalado / TOTAIS.clientesCompraramCampanha) * 100, 1))],
+    type: 'bar',
     data: {
-      labels: [
-        `Cliente Com APP (${fmt(TOTAIS.clientesComAppInstalado)})`,
-        `Cliente Sem APP (${fmt(TOTAIS.clientesSemAppInstalado)})`
-      ],
+      labels: ['Abriu o jogo', 'Abriu scan', 'Escaneou', 'Completou'],
       datasets: [{
-        data: [TOTAIS.clientesComAppInstalado, TOTAIS.clientesSemAppInstalado],
-        backgroundColor: [PALETA.cream, PALETA.lilac],
-        borderColor: ['#fff', '#fff'],
-        borderWidth: 3,
-        hoverOffset: 8
+        label: 'Clientes',
+        data: [
+          TOTAIS.gamificacaoAbriuJogo,
+          TOTAIS.gamificacaoAbriuScan,
+          TOTAIS.gamificacaoEscaneou,
+          TOTAIS.gamificacaoCompletou
+        ],
+        backgroundColor: [PALETA.lilacBg, PALETA.caramelBg, PALETA.orangeBg, PALETA.pinkBg],
+        borderColor: [PALETA.lilac, PALETA.caramel, PALETA.orange, PALETA.pink],
+        borderWidth: 2,
+        borderRadius: 10,
+        borderSkipped: false
       }]
     },
     options: {
+      indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '68%',
       plugins: {
         legend: { display: false },
         tooltip: {
           backgroundColor: 'rgba(61,26,0,0.9)',
           callbacks: {
-            label: ctx => {
-              const total = TOTAIS.clientesCompraramCampanha;
-              const pct = (ctx.parsed / total) * 100;
-              return ` ${fmt(ctx.parsed)} clientes (${fmtPct(pct, 1)})`;
-            }
+            label: ctx => ` ${fmt(ctx.parsed.x)} clientes`
           }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(0,0,0,0.04)' },
+          ticks: { callback: value => fmt(value) }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { font: { size: 11, weight: '600' } }
         }
       }
     }
@@ -427,38 +436,35 @@ function buildOperationalTotalizers() {
   const container = document.getElementById('operationalTotalizers');
   if (!container) return;
 
-  const growth = ((EVOLUCAO_DIARIA_CAMPANHA[1].Dentro.clientes - EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) / EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) * 100;
-  const periodTotals = getOperationalPeriodTotals();
-
-  const scopeRows = selectedStore
-    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore)
-    : [];
-
-  const scopeTotals = selectedStore
-    ? scopeRows.reduce((acc, row) => ({
-        vendasApp: acc.vendasApp + row.vendasApp,
-        vendasTotais: acc.vendasTotais + row.vendasTotais,
-        clientesParticipantes: acc.clientesParticipantes + row.clientes,
-        clientesSemApp: acc.clientesSemApp + row.clientesSemApp
-      }), {
-        vendasApp: 0,
-        vendasTotais: 0,
-        clientesParticipantes: 0,
-        clientesSemApp: 0
-      })
-    : periodTotals;
-
-  const participation = scopeTotals.clientesParticipantes + scopeTotals.clientesSemApp > 0
-    ? (scopeTotals.clientesParticipantes / (scopeTotals.clientesParticipantes + scopeTotals.clientesSemApp)) * 100
-    : TOTAIS.participacaoApp;
-
-  const scopeLabel = selectedStore ? selectedStore : '13/03 a 18/03';
-
   const cards = [
-    { cls: 'kpi-purple', icon: 'fa-cart-shopping', label: 'Vendas app', value: fmt(scopeTotals.vendasApp), sub: `recorte: ${scopeLabel}` },
-    { cls: 'kpi-green', icon: 'fa-store', label: 'Vendas totais', value: fmt(scopeTotals.vendasTotais), sub: `recorte: ${scopeLabel}` },
-    { cls: 'kpi-orange', icon: 'fa-users', label: 'Compraram pelo app', value: fmt(scopeTotals.clientesParticipantes), sub: `${fmtPct(participation, 2)} no recorte` },
-    { cls: 'kpi-pink', icon: 'fa-user-xmark', label: 'Clientes sem app', value: fmt(scopeTotals.clientesSemApp), sub: selectedStore ? 'loja selecionada' : `crescimento diário ${fmtPct(growth, 1)}` }
+    {
+      cls: 'kpi-purple',
+      icon: 'fa-users',
+      label: 'Clientes compraram produtos da campanha',
+      value: fmt(TOTAIS.clientesCompraramCampanha),
+      sub: 'total de clientes da campanha'
+    },
+    {
+      cls: 'kpi-green',
+      icon: 'fa-mobile-screen-button',
+      label: 'Clientes com app',
+      value: fmt(TOTAIS.clientesComAppInstalado),
+      sub: 'base com app identificado'
+    },
+    {
+      cls: 'kpi-orange',
+      icon: 'fa-receipt',
+      label: 'CUPONS VENDAS',
+      value: fmt(TOTAIS.cuponsVendasCampanha),
+      sub: 'volume total de vendas da campanha'
+    },
+    {
+      cls: 'kpi-pink',
+      icon: 'fa-store',
+      label: 'Total de lojas ativas na campanha',
+      value: fmt(TOTAIS.lojasParticipantes),
+      sub: 'lojas ativas no período'
+    }
   ];
 
   container.innerHTML = cards.map(card => `
@@ -629,35 +635,20 @@ function buildDailyCampaignTable() {
   const tbody = document.getElementById('dailyCampaignTableBody');
   if (!tbody) return;
 
-  const total = getOperationalPeriodTotals();
-
-  const totalPct = total.clientesTotais > 0
-    ? (total.clientesParticipantes / total.clientesTotais) * 100
-    : 0;
+  const totalTickets = EVOLUCAO_DIARIA_CAMPANHA.reduce((sum, d) => sum + d.Total.tickets, 0);
+  const totalClientes = EVOLUCAO_DIARIA_CAMPANHA.reduce((sum, d) => sum + d.Total.clientes, 0);
 
   tbody.innerHTML = EVOLUCAO_DIARIA_CAMPANHA.map(d => `
     <tr>
       <td><strong>${d.data}</strong></td>
-      <td>${fmt(d.Dentro.qtd)}</td>
-      <td>${fmt(d.Dentro.tickets)}</td>
-      <td>${fmt(d.Dentro.clientes)}</td>
-      <td><strong>${fmt(d.Total.qtd)}</strong></td>
-      <td><strong>${fmt(d.Total.tickets)}</strong></td>
-      <td><strong>${fmt(d.Total.clientes)}</strong></td>
-      <td>${fmt(d.Fora.clientes)}</td>
-      <td>${fmtPct((d.Dentro.clientes / d.Total.clientes) * 100, 1)}</td>
+      <td>${fmt(d.Total.tickets)}</td>
+      <td>${fmt(d.Total.clientes)}</td>
     </tr>
   `).join('') + `
     <tr class="table-total-row">
       <td><strong>Total</strong></td>
-      <td><strong>${fmt(total.vendasApp)}</strong></td>
-      <td><strong>${fmt(total.appCupons)}</strong></td>
-      <td><strong>${fmt(total.clientesParticipantes)}</strong></td>
-      <td><strong>${fmt(total.vendasTotais)}</strong></td>
-      <td><strong>${fmt(total.cuponsTotais)}</strong></td>
-      <td><strong>${fmt(total.clientesTotais)}</strong></td>
-      <td><strong>${fmt(total.clientesSemApp)}</strong></td>
-      <td><strong>${fmtPct(totalPct, 1)}</strong></td>
+      <td><strong>${fmt(totalTickets)}</strong></td>
+      <td><strong>${fmt(totalClientes)}</strong></td>
     </tr>
   `;
 }
@@ -926,93 +917,21 @@ function buildCRMLine() {
   if (!ctx) return;
 
   chartInstances.chartCRMDiario = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: EVOLUCAO_DIARIA_GERAL.map(d => d.data),
-      datasets: [
-        {
-          label: 'Clientes Totais',
-          data: EVOLUCAO_DIARIA_GERAL.map(d => d.clientes),
-          borderColor: PALETA.lilac,
-          backgroundColor: PALETA.lilacBg,
-          borderWidth: 3,
-          pointRadius: 4,
-          pointBackgroundColor: PALETA.lilac,
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
-          cubicInterpolationMode: 'monotone',
-          tension: 0.45,
-          fill: true
-        },
-        {
-          label: 'Cupons Totais',
-          data: EVOLUCAO_DIARIA_GERAL.map(d => d.cupons),
-          borderColor: PALETA.caramel,
-          backgroundColor: PALETA.caramelBg,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointBackgroundColor: PALETA.caramel,
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
-          cubicInterpolationMode: 'monotone',
-          tension: 0.45,
-          fill: false,
-          borderDash: [6, 4]
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: {
-          position: 'top',
-          labels: {
-            usePointStyle: true,
-            padding: 14,
-            font: { size: 12 }
-          }
-        },
-        tooltip: {
-          backgroundColor: 'rgba(61,26,0,0.9)',
-          titleColor: '#fff',
-          bodyColor: '#f5ead8',
-          padding: 10,
-          cornerRadius: 10
-        }
-      },
-      scales: {
-        x: { grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false } },
-        y: {
-          grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
-          ticks: { callback: value => fmt(value) }
-        }
-      }
-    }
-  });
-}
-
-function buildCRMFunnel() {
-  destroyChart('chartCRMFunil');
-  const ctx = document.getElementById('chartCRMFunil');
-  if (!ctx) return;
-
-  chartInstances.chartCRMFunil = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Base total', 'Clientes não participantes', 'Clientes participantes'],
+      labels: ['Abriu o jogo', 'Abriu scan', 'Escaneou', 'Completou'],
       datasets: [{
         label: 'Clientes',
         data: [
-          TOTAIS.clientesTotalBase,
-          TOTAIS.clientesNaoParticipantes,
-          TOTAIS.clientesParticipantes
+          TOTAIS.gamificacaoAbriuJogo,
+          TOTAIS.gamificacaoAbriuScan,
+          TOTAIS.gamificacaoEscaneou,
+          TOTAIS.gamificacaoCompletou
         ],
-        backgroundColor: [PALETA.caramelBg, '#f5ead8', PALETA.pinkBg],
-        borderColor: [PALETA.caramel, '#d9cdbd', PALETA.pink],
+        backgroundColor: [PALETA.lilacBg, PALETA.caramelBg, PALETA.orangeBg, PALETA.pinkBg],
+        borderColor: [PALETA.lilac, PALETA.caramel, PALETA.orange, PALETA.pink],
         borderWidth: 2,
-        borderRadius: 8,
+        borderRadius: 10,
         borderSkipped: false
       }]
     },
@@ -1029,9 +948,48 @@ function buildCRMFunnel() {
       scales: {
         x: { grid: { display: false } },
         y: {
-          grid: { color: 'rgba(0,0,0,0.04)' },
-          ticks: {
-            callback: value => value >= 1000 ? `${Math.round(value / 1000)}k` : value
+          grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
+          beginAtZero: true,
+          ticks: { callback: value => fmt(value) }
+        }
+      }
+    }
+  });
+}
+
+function buildCRMFunnel() {
+  destroyChart('chartCRMFunil');
+  const ctx = document.getElementById('chartCRMFunil');
+  if (!ctx) return;
+
+  const value = TOTAIS.gamificacaoEscaneou;
+  const remainder = TOTAIS.gamificacaoAbriuScan - TOTAIS.gamificacaoEscaneou;
+  const total = TOTAIS.gamificacaoAbriuScan;
+  const pct = total > 0 ? (value / total) * 100 : 0;
+
+  chartInstances.chartCRMFunil = new Chart(ctx, {
+    type: 'doughnut',
+    plugins: [getDonutCenterPlugin(fmtPct(pct, 1))],
+    data: {
+      labels: ['Escaneou', 'Não escaneou'],
+      datasets: [{
+        data: [value, remainder],
+        backgroundColor: [PALETA.cream, PALETA.lilac],
+        borderColor: ['#fff', '#fff'],
+        borderWidth: 3,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(61,26,0,0.9)',
+          callbacks: {
+            label: ctx => ` ${fmt(ctx.parsed)} clientes (${fmtPct((ctx.parsed / total) * 100, 1)})`
           }
         }
       }
@@ -1043,90 +1001,91 @@ function buildCRMDayTable() {
   const tbody = document.getElementById('crmDayTableBody');
   if (!tbody) return;
 
-  const dailyMap = Object.fromEntries(
-    EVOLUCAO_DIARIA_CAMPANHA.map(d => [d.data, d])
-  );
+  const rows = [
+    {
+      etapa: 'Abriu o jogo',
+      clientes: TOTAIS.gamificacaoAbriuJogo,
+      pctEtapa: 100,
+      pctJogo: 100
+    },
+    {
+      etapa: 'Abriu scan',
+      clientes: TOTAIS.gamificacaoAbriuScan,
+      pctEtapa: (TOTAIS.gamificacaoAbriuScan / TOTAIS.gamificacaoAbriuJogo) * 100,
+      pctJogo: (TOTAIS.gamificacaoAbriuScan / TOTAIS.gamificacaoAbriuJogo) * 100
+    },
+    {
+      etapa: 'Escaneou',
+      clientes: TOTAIS.gamificacaoEscaneou,
+      pctEtapa: (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100,
+      pctJogo: (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuJogo) * 100
+    },
+    {
+      etapa: 'Completou',
+      clientes: TOTAIS.gamificacaoCompletou,
+      pctEtapa: (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoEscaneou) * 100,
+      pctJogo: (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoAbriuJogo) * 100
+    }
+  ];
 
-  tbody.innerHTML = EVOLUCAO_DIARIA_GERAL.map(d => {
-    const campanha = dailyMap[d.data];
-    const participantes = campanha ? campanha.Dentro.clientes : 0;
-    const naoParticipantes = campanha ? campanha.Fora.clientes : d.clientes;
-    const pct = d.clientes > 0 ? (participantes / d.clientes) * 100 : 0;
-
-    return `
-      <tr>
-        <td><strong>${d.data}</strong></td>
-        <td>${fmt(d.clientes)}</td>
-        <td style="color:var(--caramel);font-weight:700">${fmt(participantes)}</td>
-        <td>${fmt(naoParticipantes)}</td>
-        <td>
-          ${
-            participantes > 0
-              ? `<span style="background:var(--lilac);color:#fff;padding:2px 8px;border-radius:10px;font-size:0.76rem;font-weight:700">${fmtPct(pct, 1)}</span>`
-              : '<span style="color:#ccc;font-size:0.76rem">0,0%</span>'
-          }
-        </td>
-      </tr>
-    `;
-  }).join('');
+  tbody.innerHTML = rows.map(row => `
+    <tr>
+      <td><strong>${row.etapa}</strong></td>
+      <td>${fmt(row.clientes)}</td>
+      <td>${fmtPct(row.pctEtapa, 1)}</td>
+      <td>${fmtPct(row.pctJogo, 1)}</td>
+    </tr>
+  `).join('');
 }
 
 function buildCRMInsights() {
   const container = document.getElementById('crmInsights');
   if (!container) return;
 
-  const growth =
-    ((EVOLUCAO_DIARIA_CAMPANHA[1].Dentro.clientes - EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) /
-      EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) * 100;
-
-  const topStore = LOJAS_OPERACIONAL[0];
-  const topProduct = RANKING_DENTRO[0];
+  const pctAbriuScan = (TOTAIS.gamificacaoAbriuScan / TOTAIS.gamificacaoAbriuJogo) * 100;
+  const pctEscaneou = (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100;
+  const pctCompletouScan = (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoEscaneou) * 100;
+  const pctCompletouJogo = (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoAbriuJogo) * 100;
 
   const insights = [
     {
-      icon: 'fas fa-arrow-trend-up',
-      type: 'good',
-      title: 'Crescimento forte entre 13/03 e 14/03',
-      text: `Clientes participantes cresceram ${fmtPct(growth, 1)} no comparativo diário.`
-    },
-    {
-      icon: 'fas fa-percent',
+      icon: 'fas fa-gamepad',
       type: 'info',
-      title: 'Participação atual da campanha',
-      text: `${fmtPct(TOTAIS.participacaoApp, 2)} da base já comprou pelo app.`
+      title: 'Base da jornada do jogo',
+      text: `${fmt(TOTAIS.gamificacaoAbriuJogo)} clientes abriram o jogo no CRM.`
     },
     {
-      icon: 'fas fa-store',
-      type: 'good',
-      title: 'Loja líder na campanha',
-      text: `${topStore.loja} lidera com ${fmt(topStore.vendasApp)} vendas app e ${fmt(topStore.clientesSemApp)} clientes sem app estimados.`
-    },
-    {
-      icon: 'fas fa-egg',
+      icon: 'fas fa-mobile-screen-button',
       type: 'warn',
-      title: 'Produto com maior tração',
-      text: `${topProduct.nome} lidera com ${fmt(topProduct.itens)} itens e ${fmt(topProduct.clientes)} clientes.`
+      title: 'Abertura de scan ainda baixa',
+      text: `${fmtPct(pctAbriuScan, 2)} de quem abriu o jogo chegou até a tela de scan.`
     },
     {
-      icon: 'fas fa-box-open',
-      type: 'info',
-      title: 'Cobertura de itens da campanha',
-      text: `${fmt(TOTAIS.produtosApp)} dos ${fmt(TOTAIS.produtosCampanha)} produtos já tiveram vendas app.`
+      icon: 'fas fa-qrcode',
+      type: 'good',
+      title: 'Scan success muito alto',
+      text: `${fmtPct(pctEscaneou, 2)} de quem abriu scan conseguiu escanear.`
     },
     {
-      icon: 'fas fa-users-slash',
+      icon: 'fas fa-flag-checkered',
       type: 'alert',
-      title: 'Clientes não participantes',
-      text: `Ainda existem ${fmt(TOTAIS.clientesNaoParticipantes)} clientes que não compraram pelo app.`
+      title: 'Conclusão final da jornada',
+      text: `${fmt(TOTAIS.gamificacaoCompletou)} clientes completaram a jornada, ou ${fmtPct(pctCompletouJogo, 2)} de quem abriu o jogo.`
+    },
+    {
+      icon: 'fas fa-bullseye',
+      type: 'info',
+      title: 'Conversão após o scan',
+      text: `${fmtPct(pctCompletouScan, 2)} de quem escaneou chegou até a conclusão.`
     }
   ];
 
-  container.innerHTML = insights.map(ins => `
-    <div class="insight-card">
-      <div class="insight-icon ${ins.type}"><i class="${ins.icon}"></i></div>
-      <div class="insight-text">
-        <strong>${ins.title}</strong>
-        <p>${ins.text}</p>
+  container.innerHTML = insights.map(card => `
+    <div class="insight-card ${card.type}">
+      <div class="insight-icon"><i class="${card.icon}"></i></div>
+      <div>
+        <h4>${card.title}</h4>
+        <p>${card.text}</p>
       </div>
     </div>
   `).join('');
