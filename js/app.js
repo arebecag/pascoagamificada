@@ -355,17 +355,16 @@ function buildDonutCampanha() {
   chartInstances.chartDonutClientes = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Abriu o jogo', 'Abriu scan', 'Escaneou', 'Completou'],
+      labels: ['Abriu o jogo', 'Abriu scan', 'Escaneou'],
       datasets: [{
         label: 'Clientes',
         data: [
           TOTAIS.gamificacaoAbriuJogo,
           TOTAIS.gamificacaoAbriuScan,
-          TOTAIS.gamificacaoEscaneou,
-          TOTAIS.gamificacaoCompletou
+          TOTAIS.gamificacaoEscaneou
         ],
-        backgroundColor: [PALETA.lilacBg, PALETA.caramelBg, PALETA.orangeBg, PALETA.pinkBg],
-        borderColor: [PALETA.lilac, PALETA.caramel, PALETA.orange, PALETA.pink],
+        backgroundColor: [PALETA.lilacBg, PALETA.caramelBg, PALETA.orangeBg],
+        borderColor: [PALETA.lilac, PALETA.caramel, PALETA.orange],
         borderWidth: 2,
         borderRadius: 10,
         borderSkipped: false
@@ -915,17 +914,16 @@ function buildCRMLine() {
   chartInstances.chartCRMDiario = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Abriu o jogo', 'Abriu scan', 'Escaneou', 'Completou'],
+      labels: ['Abriu o jogo', 'Abriu scan', 'Escaneou'],
       datasets: [{
         label: 'Clientes',
         data: [
           TOTAIS.gamificacaoAbriuJogo,
           TOTAIS.gamificacaoAbriuScan,
-          TOTAIS.gamificacaoEscaneou,
-          TOTAIS.gamificacaoCompletou
+          TOTAIS.gamificacaoEscaneou
         ],
-        backgroundColor: [PALETA.lilacBg, PALETA.caramelBg, PALETA.orangeBg, PALETA.pinkBg],
-        borderColor: [PALETA.lilac, PALETA.caramel, PALETA.orange, PALETA.pink],
+        backgroundColor: [PALETA.lilacBg, PALETA.caramelBg, PALETA.orangeBg],
+        borderColor: [PALETA.lilac, PALETA.caramel, PALETA.orange],
         borderWidth: 2,
         borderRadius: 10,
         borderSkipped: false
