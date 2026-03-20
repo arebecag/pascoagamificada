@@ -34,9 +34,9 @@ const TOTAIS = {
   viewsCampanha: 51245,
   scanSuccess: 6717,
   gamificacaoAbriuJogo: 16752,
-  gamificacaoAbriuScan: 329,
-  gamificacaoEscaneou: 313,
-  gamificacaoCompletou: 18,
+  gamificacaoAbriuScan: 384,
+  gamificacaoEscaneou: 365,
+  gamificacaoCompletou: 25,
   overlap: 0,
   produtosCampanha: 19,
   produtosApp: 13
