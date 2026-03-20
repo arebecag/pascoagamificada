@@ -12,24 +12,34 @@ const PALETA = {
   orangeBg: 'rgba(230,126,34,0.15)',
   caramel: '#e8a020',
   caramelBg: 'rgba(232,160,32,0.18)',
-  mint: '#27ae60',
-  mintBg: 'rgba(39,174,96,0.15)',
+  mint: '#9c5a1a',
+  mintBg: 'rgba(156,90,26,0.14)',
   choco: '#7b3f1a',
   chocoBg: 'rgba(123,63,26,0.12)',
   cream: '#f5ead8',
 };
 
 const TOTAIS = {
-  clientesDentro: 4162,
-  cuponsDentro: 4489,
-  itensDentro: 6616,
-  lojasDentro: 67,
-  participacao: 11.0483,
-  clientesTotalBase: 37671,
-  clientesForaBase: 33509,
+  clientesParticipantes: 6717,
+  cuponsApp: 7243,
+  vendasApp: 10687,
+  lojasParticipantes: 67,
+  cuponsVendasCampanha: 83991,
+  participacaoApp: 13,
+  clientesTotalBase: 51245,
+  clientesNaoParticipantes: 44528,
+  clientesCompraramCampanha: 51245,
+  clientesComAppInstalado: 35199,
+  clientesSemAppInstalado: 16046,
+  viewsCampanha: 51245,
+  scanSuccess: 6717,
+  gamificacaoAbriuJogo: 16752,
+  gamificacaoAbriuScan: 384,
+  gamificacaoEscaneou: 365,
+  gamificacaoCompletou: 25,
   overlap: 0,
   produtosCampanha: 19,
-  produtosDentro: 13
+  produtosApp: 13
 };
 
 const EVOLUCAO_DIARIA_CAMPANHA = [
@@ -62,6 +72,18 @@ const EVOLUCAO_DIARIA_CAMPANHA = [
     Dentro: { qtd: 1676, tickets: 1203, clientes: 1114 },
     Fora:   { qtd: 7500, tickets: 5217, clientes: 4879 },
     Total:  { qtd: 9176, tickets: 6420, clientes: 5993 }
+  },
+  {
+    data: '18/03',
+    Dentro: { qtd: 2192, tickets: 1437, clientes: 1334 },
+    Fora:   { qtd: 8471, tickets: 5848, clientes: 5498 },
+    Total:  { qtd: 10663, tickets: 7285, clientes: 6832 }
+  },
+  {
+    data: '19/03',
+    Dentro: { qtd: 1879, tickets: 1317, clientes: 1221 },
+    Fora:   { qtd: 7967, tickets: 5736, clientes: 5362 },
+    Total:  { qtd: 9846, tickets: 7053, clientes: 6583 }
   }
 ];
 
@@ -82,93 +104,95 @@ const EVOLUCAO_DIARIA_GERAL = [
   { data: '14/03', qtd: 21156, cupons: 12517, clientes: 11745 },
   { data: '15/03', qtd: 11086, cupons: 7984, clientes: 7408 },
   { data: '16/03', qtd: 6696, cupons: 5094, clientes: 4705 },
-  { data: '17/03', qtd: 9176, cupons: 6420, clientes: 5993 }
+  { data: '17/03', qtd: 9176, cupons: 6420, clientes: 5993 },
+  { data: '18/03', qtd: 10663, cupons: 7285, clientes: 6832 },
+  { data: '19/03', qtd: 9846, cupons: 7053, clientes: 6583 }
 ];
 
 const RANKING_LOJAS_DENTRO = [
-  { loja: '33. São José - Rua Joinville', qtd: 360, tickets: 256, clientes: 243 },
-  { loja: '21. Nilo Peçanha', qtd: 328, tickets: 197, clientes: 180 },
-  { loja: '06. Pinheirinho', qtd: 316, tickets: 161, clientes: 152 },
-  { loja: '63. Maringá Av Kakogawa', qtd: 304, tickets: 50, clientes: 47 },
-  { loja: '82. Condor CIC JK', qtd: 294, tickets: 182, clientes: 164 },
-  { loja: '29. Água Verde', qtd: 290, tickets: 203, clientes: 194 },
-  { loja: '20. Maringá Av Paraná', qtd: 239, tickets: 186, clientes: 171 },
-  { loja: '14. São José dos Pinhais', qtd: 228, tickets: 142, clientes: 132 },
-  { loja: '04. Lapa', qtd: 209, tickets: 140, clientes: 131 },
-  { loja: '37. Cajuru', qtd: 198, tickets: 149, clientes: 144 },
-  { loja: '22. Champagnat', qtd: 184, tickets: 125, clientes: 116 },
-  { loja: '43. Almirante Tamandaré', qtd: 181, tickets: 120, clientes: 111 },
-  { loja: '91. Zonta (Franquia)', qtd: 177, tickets: 106, clientes: 100 },
-  { loja: '49. Boa Vista', qtd: 170, tickets: 135, clientes: 126 },
-  { loja: '27. Novo Mundo', qtd: 150, tickets: 105, clientes: 101 },
-  { loja: '11. São Braz', qtd: 147, tickets: 106, clientes: 101 },
-  { loja: '40. Maringá Av Colombo', qtd: 132, tickets: 109, clientes: 96 },
-  { loja: '56. Piraquara', qtd: 130, tickets: 80, clientes: 69 },
-  { loja: '58. Pilarzinho', qtd: 130, tickets: 97, clientes: 93 },
-  { loja: '54. Francisco Derosso', qtd: 122, tickets: 95, clientes: 91 },
-  { loja: '24. Santa Cândida', qtd: 122, tickets: 101, clientes: 94 },
-  { loja: '07. Marechal', qtd: 118, tickets: 83, clientes: 79 },
-  { loja: '09. Londrina', qtd: 113, tickets: 89, clientes: 71 },
-  { loja: '28. Cristo Rei', qtd: 112, tickets: 78, clientes: 70 },
-  { loja: '83. Condor Mercês', qtd: 109, tickets: 89, clientes: 83 },
-  { loja: '25. Paranaguá-Raia', qtd: 106, tickets: 83, clientes: 75 },
-  { loja: '34. Brasília', qtd: 103, tickets: 85, clientes: 78 },
-  { loja: '50. Santa Quitéria', qtd: 97, tickets: 75, clientes: 68 },
-  { loja: '05. Wenceslau Braz', qtd: 94, tickets: 62, clientes: 58 },
-  { loja: '36. Castro', qtd: 88, tickets: 63, clientes: 55 },
-  { loja: '03. Santa Felicidade', qtd: 84, tickets: 60, clientes: 55 },
-  { loja: '61. Jardim das Américas', qtd: 79, tickets: 61, clientes: 58 },
-  { loja: '13. Sítio Cercado', qtd: 79, tickets: 64, clientes: 57 },
-  { loja: '38. Colombo', qtd: 78, tickets: 63, clientes: 58 },
-  { loja: '17. Ahu', qtd: 65, tickets: 41, clientes: 38 },
-  { loja: '66. Barreirinha', qtd: 65, tickets: 53, clientes: 46 },
-  { loja: '08. Paranaguá Centro', qtd: 61, tickets: 46, clientes: 39 },
-  { loja: '19. Ponta Grossa Nova Rússia', qtd: 59, tickets: 36, clientes: 34 },
-  { loja: '60. Maringá Av Dr Luiz Teixeira', qtd: 54, tickets: 48, clientes: 46 },
-  { loja: '45. Araucária Costeira', qtd: 52, tickets: 35, clientes: 35 },
-  { loja: '26. Torres', qtd: 51, tickets: 34, clientes: 33 },
-  { loja: '39. Pinhais', qtd: 49, tickets: 41, clientes: 39 },
-  { loja: '71. Araucária Capela Velha', qtd: 48, tickets: 35, clientes: 31 },
-  { loja: '23. Araucária BR', qtd: 40, tickets: 24, clientes: 23 },
-  { loja: '47. Pinhais Av. Iraí', qtd: 36, tickets: 30, clientes: 30 },
-  { loja: '51. Joinville América', qtd: 31, tickets: 20, clientes: 19 },
-  { loja: '52. Mafra Centro II', qtd: 28, tickets: 24, clientes: 24 },
-  { loja: '53. João Bettega', qtd: 28, tickets: 12, clientes: 11 },
-  { loja: '30. Fazenda Rio Grande', qtd: 25, tickets: 11, clientes: 11 },
-  { loja: '44. Ponta Grossa - Oficinas', qtd: 24, tickets: 20, clientes: 20 },
-  { loja: '42. Ponta Grossa - Jardim Carvalho', qtd: 24, tickets: 19, clientes: 17 },
-  { loja: '41. Campo Mourão', qtd: 21, tickets: 17, clientes: 16 },
-  { loja: '32. Uvaranas', qtd: 21, tickets: 19, clientes: 18 },
-  { loja: '18. Ponta Grossa (Centro)', qtd: 19, tickets: 15, clientes: 11 },
-  { loja: '48. Joinville Itaum', qtd: 18, tickets: 12, clientes: 11 },
-  { loja: '79. São Bento do Sul Centro', qtd: 17, tickets: 12, clientes: 10 },
-  { loja: '31. Campo Largo', qtd: 16, tickets: 13, clientes: 13 },
-  { loja: '15. Apucarana', qtd: 15, tickets: 9, clientes: 9 },
-  { loja: '57. Joinville - Boa Vista', qtd: 15, tickets: 11, clientes: 9 },
-  { loja: '10. Campo Comprido', qtd: 14, tickets: 12, clientes: 11 },
-  { loja: '65. Rio Negro', qtd: 12, tickets: 9, clientes: 9 },
-  { loja: '67. Ponta Grossa - Ernesto Vilela', qtd: 8, tickets: 7, clientes: 6 },
-  { loja: '55. Jaraguá do Sul', qtd: 7, tickets: 6, clientes: 6 },
-  { loja: '78. Rio Negrinho', qtd: 7, tickets: 6, clientes: 5 },
-  { loja: '64. Gralha Azul', qtd: 6, tickets: 4, clientes: 4 },
-  { loja: '80. São Bento do Sul - Serra', qtd: 5, tickets: 4, clientes: 3 },
-  { loja: '46. Campo Largo São José', qtd: 4, tickets: 4, clientes: 4 }
+  { loja: '29. Agua Verde', qtd: 4268, tickets: 2293, clientes: 2201 },
+  { loja: '22. Champagnat', qtd: 4264, tickets: 1922, clientes: 1786 },
+  { loja: '26. Torres', qtd: 2815, tickets: 1478, clientes: 1426 },
+  { loja: '33. Sao Jose-Rua Joinville', qtd: 2647, tickets: 1981, clientes: 1893 },
+  { loja: '21. Nilo Pecanha', qtd: 2647, tickets: 1706, clientes: 1624 },
+  { loja: '06. Pinheirinho', qtd: 1819, tickets: 1278, clientes: 1206 },
+  { loja: '08. Paranagua Centro', qtd: 1798, tickets: 734, clientes: 579 },
+  { loja: '50. Santa Quiteria', qtd: 1786, tickets: 828, clientes: 775 },
+  { loja: '27. Novo Mundo', qtd: 1786, tickets: 1333, clientes: 1263 },
+  { loja: '20. Maringa Av Parana', qtd: 1773, tickets: 1335, clientes: 1231 },
+  { loja: '82. Condor Cic Jk', qtd: 1771, tickets: 1096, clientes: 1008 },
+  { loja: '25. Paranagua-Raia', qtd: 1634, tickets: 1156, clientes: 1047 },
+  { loja: '04. Lapa', qtd: 1542, tickets: 1004, clientes: 954 },
+  { loja: '52. Mafra Centro Ii', qtd: 1531, tickets: 988, clientes: 952 },
+  { loja: '66. Barreirinha', qtd: 1502, tickets: 653, clientes: 588 },
+  { loja: '14. Sao Jose Dos Pinhais', qtd: 1447, tickets: 1032, clientes: 965 },
+  { loja: '24. Santa Candida', qtd: 1430, tickets: 1042, clientes: 1000 },
+  { loja: '23. Araucaria Br', qtd: 1398, tickets: 956, clientes: 930 },
+  { loja: '56. Piraquara', qtd: 1375, tickets: 965, clientes: 909 },
+  { loja: '28. Cristo Rei', qtd: 1369, tickets: 1017, clientes: 945 },
+  { loja: '39. Pinhais', qtd: 1367, tickets: 926, clientes: 873 },
+  { loja: '83. Condor Merces', qtd: 1360, tickets: 977, clientes: 919 },
+  { loja: '32. Uvaranas', qtd: 1359, tickets: 823, clientes: 779 },
+  { loja: '49. Boa Vista', qtd: 1358, tickets: 1066, clientes: 1037 },
+  { loja: '45. Araucaria Costeira', qtd: 1346, tickets: 1084, clientes: 1021 },
+  { loja: '37. Cajuru', qtd: 1333, tickets: 1080, clientes: 1049 },
+  { loja: '05. Wenceslau Braz', qtd: 1292, tickets: 628, clientes: 574 },
+  { loja: '91. Zonta (Franquia)', qtd: 1279, tickets: 952, clientes: 906 },
+  { loja: '07. Marechal', qtd: 1274, tickets: 765, clientes: 709 },
+  { loja: '11. Sao Braz', qtd: 1258, tickets: 937, clientes: 894 },
+  { loja: '57. Joinville - Boa Vista', qtd: 1216, tickets: 800, clientes: 697 },
+  { loja: '36. Castro', qtd: 1197, tickets: 675, clientes: 607 },
+  { loja: '19. Ponta Grossa Nova Russia', qtd: 1194, tickets: 828, clientes: 776 },
+  { loja: '54. Francisco Derosso', qtd: 1150, tickets: 813, clientes: 776 },
+  { loja: '43. Almirante Tamandare', qtd: 1096, tickets: 819, clientes: 786 },
+  { loja: '47. Pinhais Av.Irai', qtd: 1074, tickets: 641, clientes: 602 },
+  { loja: '30. Fazenda Rio Grande', qtd: 1067, tickets: 748, clientes: 692 },
+  { loja: '51. Joinville America', qtd: 1020, tickets: 615, clientes: 560 },
+  { loja: '58. Pilarzinho', qtd: 1004, tickets: 791, clientes: 767 },
+  { loja: '71. Araucaria Capela Velha', qtd: 1003, tickets: 806, clientes: 729 },
+  { loja: '63. Maringa Av Kakogawa', qtd: 982, tickets: 521, clientes: 492 },
+  { loja: '60. Maringa Av Dr Luiz Teixeira', qtd: 914, tickets: 607, clientes: 553 },
+  { loja: '38. Colombo', qtd: 855, tickets: 650, clientes: 621 },
+  { loja: '67. Ponta Grossa - Ernesto Vilela', qtd: 846, tickets: 512, clientes: 476 },
+  { loja: '10. Campo Comprido', qtd: 841, tickets: 693, clientes: 630 },
+  { loja: '41. Campo Mourao', qtd: 839, tickets: 589, clientes: 568 },
+  { loja: '44. Ponta Grossa - Oficinas', qtd: 817, tickets: 627, clientes: 585 },
+  { loja: '40. Maringa Av Colombo', qtd: 780, tickets: 663, clientes: 589 },
+  { loja: '55. Jaragua Do Sul', qtd: 759, tickets: 425, clientes: 382 },
+  { loja: '15. Apucarana', qtd: 754, tickets: 448, clientes: 411 },
+  { loja: '31. Campo Largo', qtd: 743, tickets: 514, clientes: 480 },
+  { loja: '42. Ponta Grossa - Jardim Carvalho', qtd: 739, tickets: 517, clientes: 478 },
+  { loja: '61. Jardim Das Americas', qtd: 736, tickets: 463, clientes: 436 },
+  { loja: '03. Santa Felicidade', qtd: 722, tickets: 561, clientes: 516 },
+  { loja: '13. Sitio Cercado', qtd: 715, tickets: 579, clientes: 540 },
+  { loja: '48. Joinville Itaum', qtd: 684, tickets: 495, clientes: 419 },
+  { loja: '79. Sao Bento Do Sul Centro', qtd: 660, tickets: 471, clientes: 409 },
+  { loja: '09. Londrina', qtd: 652, tickets: 509, clientes: 434 },
+  { loja: '64. Gralha Azul', qtd: 647, tickets: 532, clientes: 491 },
+  { loja: '46. Campo Largo Sao Jose', qtd: 643, tickets: 513, clientes: 481 },
+  { loja: '65. Rio Negro', qtd: 617, tickets: 369, clientes: 351 },
+  { loja: '53. Joao Bettega', qtd: 573, tickets: 387, clientes: 362 },
+  { loja: '80. Sao Bento Do Sul - Serra', qtd: 568, tickets: 392, clientes: 327 },
+  { loja: '34. Brasilia', qtd: 565, tickets: 434, clientes: 393 },
+  { loja: '78. Rio Negrinho', qtd: 546, tickets: 255, clientes: 207 },
+  { loja: '17. Ahu', qtd: 492, tickets: 332, clientes: 315 },
+  { loja: '18. Ponta Grossa(Centro)', qtd: 453, tickets: 340, clientes: 264 }
 ];
 
 const SALES_DENTRO_MAP = {
-  1991454: { itens: 12, tickets: 7, clientes: 7 },
-  2077535: { itens: 2430, tickets: 1394, clientes: 1282 },
-  2077543: { itens: 2304, tickets: 1633, clientes: 1522 },
+  1991454: { itens: 24, tickets: 12, clientes: 12 },
+  2077535: { itens: 3817, tickets: 2274, clientes: 2088 },
+  2077543: { itens: 3758, tickets: 2605, clientes: 2425 },
   2077576: { itens: 1, tickets: 1, clientes: 1 },
-  2077584: { itens: 1824, tickets: 1419, clientes: 1315 },
+  2077584: { itens: 3030, tickets: 2305, clientes: 2145 },
   2128411: { itens: 3, tickets: 2, clientes: 2 },
-  2207371: { itens: 1, tickets: 1, clientes: 1 },
-  2207389: { itens: 2, tickets: 2, clientes: 2 },
-  2207397: { itens: 1, tickets: 1, clientes: 1 },
-  2207405: { itens: 4, tickets: 4, clientes: 4 },
-  2207413: { itens: 12, tickets: 9, clientes: 9 },
+  2207371: { itens: 3, tickets: 3, clientes: 3 },
+  2207389: { itens: 5, tickets: 5, clientes: 5 },
+  2207397: { itens: 2, tickets: 2, clientes: 2 },
+  2207405: { itens: 7, tickets: 7, clientes: 7 },
+  2207413: { itens: 14, tickets: 10, clientes: 10 },
   2207421: { itens: 21, tickets: 15, clientes: 15 },
-  2207439: { itens: 1, tickets: 1, clientes: 1 }
+  2207439: { itens: 2, tickets: 2, clientes: 2 }
 };
 
 const PRODUTOS_CAMPANHA_BASE = [
@@ -370,3 +394,50 @@ const RANKING_DENTRO = PRODUTOS_CAMPANHA
   .sort((a, b) => b.itens - a.itens);
 
 const PODIO_TOP3 = RANKING_DENTRO.slice(0, 3);
+
+
+const PARTICIPATION_RATE = TOTAIS.clientesParticipantes / TOTAIS.clientesTotalBase;
+
+const LOJAS_OPERACIONAL = (() => {
+  const totalShareBase = RANKING_LOJAS_DENTRO.reduce((sum, row) => sum + row.clientes, 0);
+  let allocatedClientesCampanha = 0;
+  let allocatedClientesComApp = 0;
+  let allocatedCuponsVendas = 0;
+
+  return RANKING_LOJAS_DENTRO.map((row, index, arr) => {
+    const share = totalShareBase > 0 ? row.clientes / totalShareBase : 0;
+
+    let clientesCampanha;
+    let clientesComApp;
+    let cuponsVendas;
+
+    if (index < arr.length - 1) {
+      clientesCampanha = Math.round(TOTAIS.clientesCompraramCampanha * share);
+      clientesComApp = Math.round(TOTAIS.clientesComAppInstalado * share);
+      cuponsVendas = Math.round(TOTAIS.cuponsVendasCampanha * share);
+
+      allocatedClientesCampanha += clientesCampanha;
+      allocatedClientesComApp += clientesComApp;
+      allocatedCuponsVendas += cuponsVendas;
+    } else {
+      clientesCampanha = TOTAIS.clientesCompraramCampanha - allocatedClientesCampanha;
+      clientesComApp = TOTAIS.clientesComAppInstalado - allocatedClientesComApp;
+      cuponsVendas = TOTAIS.cuponsVendasCampanha - allocatedCuponsVendas;
+    }
+
+    const clientesSemApp = Math.max(0, clientesCampanha - clientesComApp);
+
+    return {
+      ...row,
+      vendasApp: row.qtd,
+      vendasTotais: cuponsVendas,
+      clientesSemApp,
+      clientesCampanha,
+      clientesComApp,
+      cuponsVendas,
+      shareClientesApp: share
+    };
+  });
+})();
+
+const PODIO_TOP3_LOJAS = LOJAS_OPERACIONAL.slice(0, 3);
