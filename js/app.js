@@ -144,7 +144,7 @@ function renderSection(id) {
 }
 
 /**
- * Série completa 01/03 a 19/03
+ * Série completa 01/03 a 22/03
  * - Antes de 13/03: participantes app = 0 e demais clientes = total do dia
  * - 13/03 em diante: participantes app e não participantes conforme planilha
  */
@@ -997,22 +997,22 @@ function buildCRMDayTable() {
 
   const rows = [
     {
-      etapa: 'Abriu o jogo',
-      clientes: TOTAIS.gamificacaoAbriuJogo,
-      pctEtapa: 100,
-      pctJogo: 100
-    },
-    {
       etapa: 'Abriu scan',
       clientes: TOTAIS.gamificacaoAbriuScan,
-      pctEtapa: (TOTAIS.gamificacaoAbriuScan / TOTAIS.gamificacaoAbriuJogo) * 100,
-      pctJogo: (TOTAIS.gamificacaoAbriuScan / TOTAIS.gamificacaoAbriuJogo) * 100
+      pctEtapa: 100,
+      pctBase: 100
     },
     {
       etapa: 'Escaneou',
       clientes: TOTAIS.gamificacaoEscaneou,
       pctEtapa: (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100,
-      pctJogo: (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuJogo) * 100
+      pctBase: (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100
+    },
+    {
+      etapa: 'CPFs que compraram',
+      clientes: TOTAIS.gamificacaoCompletou,
+      pctEtapa: (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoEscaneou) * 100,
+      pctBase: (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoAbriuScan) * 100
     },
   ];
 
@@ -1021,7 +1021,7 @@ function buildCRMDayTable() {
       <td><strong>${row.etapa}</strong></td>
       <td>${fmt(row.clientes)}</td>
       <td>${fmtPct(row.pctEtapa, 1)}</td>
-      <td>${fmtPct(row.pctJogo, 1)}</td>
+      <td>${fmtPct(row.pctBase, 1)}</td>
     </tr>
   `).join('');
 }
@@ -1032,25 +1032,26 @@ function buildCRMInsights() {
 
   const pctAbriuScan = (TOTAIS.gamificacaoAbriuScan / TOTAIS.gamificacaoAbriuJogo) * 100;
   const pctEscaneou = (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100;
+  const pctCompraram = (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoEscaneou) * 100;
 
   const insights = [
     {
-      icon: 'fas fa-gamepad',
-      type: 'info',
-      title: 'Base da jornada do jogo',
-      text: `${fmt(TOTAIS.gamificacaoAbriuJogo)} clientes abriram o jogo no CRM.`
-    },
-    {
       icon: 'fas fa-mobile-screen-button',
-      type: 'warn',
-      title: 'Abertura de scan ainda baixa',
-      text: `${fmtPct(pctAbriuScan, 2)} de quem abriu o jogo chegou até a tela de scan.`
+      type: 'info',
+      title: 'Volume de abertura de scan',
+      text: `${fmt(TOTAIS.gamificacaoAbriuScan)} clientes chegaram até a tela de scan no CRM (${fmtPct(pctAbriuScan, 2)} de quem abriu o jogo).`
     },
     {
       icon: 'fas fa-qrcode',
       type: 'good',
       title: 'Scan success muito alto',
       text: `${fmtPct(pctEscaneou, 2)} de quem abriu scan conseguiu escanear.`
+    },
+    {
+      icon: 'fas fa-cart-shopping',
+      type: 'warn',
+      title: 'Conversão em compra após scan',
+      text: `${fmtPct(pctCompraram, 2)} de quem escaneou avançou até CPFs que compraram.`
     },
   ];
 

@@ -16,7 +16,7 @@
     href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css"
   />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="css/main.css?v=20260320-data-fix" />
+  <link rel="stylesheet" href="css/main.css?v=20260323-data-fix" />
 </head>
 <body>
 
@@ -56,7 +56,7 @@
 
         <div class="sidebar-meta">
           <span class="meta-dot"></span>
-          <span>Atualização: 19/03/2026</span>
+          <span>Atualização: 22/03/2026</span>
         </div>
 
         <nav class="sidebar-nav">
@@ -108,7 +108,7 @@
             <div class="kpi-icon"><i class="fas fa-users"></i></div>
             <div class="kpi-info">
               <span class="kpi-label">Clientes compraram produtos da campanha</span>
-              <span class="kpi-value" data-count="51245">0</span>
+              <span class="kpi-value" data-count="76474">0</span>
               <span class="kpi-sub">total de clientes da campanha</span>
             </div>
           </div>
@@ -117,7 +117,7 @@
             <div class="kpi-icon"><i class="fas fa-mobile-screen-button"></i></div>
             <div class="kpi-info">
               <span class="kpi-label">Clientes com app</span>
-              <span class="kpi-value" data-count="35199">0</span>
+              <span class="kpi-value" data-count="14854">0</span>
               <span class="kpi-sub">base com app identificado</span>
             </div>
           </div>
@@ -126,7 +126,7 @@
             <div class="kpi-icon"><i class="fas fa-receipt"></i></div>
             <div class="kpi-info">
               <span class="kpi-label">CUPONS VENDAS</span>
-              <span class="kpi-value" data-count="83991">0</span>
+              <span class="kpi-value" data-count="81851">0</span>
               <span class="kpi-sub">volume total de vendas da campanha</span>
             </div>
           </div>
@@ -145,7 +145,7 @@
           <div class="chart-card chart-card-wide">
            <div class="chart-header">
   <h3><i class="fas fa-chart-line"></i> Evolução Diária — Campanha</h3>
-  <p class="chart-sub">Comparativo diário de 01/03 a 19/03 — compraram vs compraram pelo app</p>
+  <p class="chart-sub">Comparativo diário de 01/03 a 22/03 — compraram vs compraram pelo app</p>
 </div>
 
             <div class="chart-body" style="height:260px">
@@ -163,8 +163,8 @@
             </div>
             <div class="donut-legend">
               <span class="dot dot-purple"></span><span>Abriu o jogo <strong>16.752</strong></span>
-              <span class="dot dot-orange"></span><span>Abriu scan <strong>384</strong></span>
-              <span class="dot dot-cream"></span><span>Escaneou <strong>365</strong></span>
+              <span class="dot dot-orange"></span><span>Abriu scan <strong>673</strong></span>
+              <span class="dot dot-cream"></span><span>Escaneou <strong>639</strong></span>
             </div>
           </div>
         </div>
@@ -356,21 +356,12 @@
         </div>
 
         <div class="kpi-row">
-          <div class="kpi-card kpi-purple">
-            <div class="kpi-icon"><i class="fas fa-gamepad"></i></div>
-            <div class="kpi-info">
-              <span class="kpi-label">Abriu o jogo</span>
-              <span class="kpi-value" data-count="16752">0</span>
-              <span class="kpi-sub">clientes únicos da jornada</span>
-            </div>
-          </div>
-
           <div class="kpi-card kpi-green">
             <div class="kpi-icon"><i class="fas fa-mobile-screen-button"></i></div>
             <div class="kpi-info">
               <span class="kpi-label">Abriu scan</span>
-              <span class="kpi-value" data-count="384">0</span>
-              <span class="kpi-sub">2,29% de quem abriu o jogo</span>
+              <span class="kpi-value" data-count="673">0</span>
+              <span class="kpi-sub">4,02% de quem abriu o jogo</span>
             </div>
           </div>
 
@@ -378,8 +369,17 @@
             <div class="kpi-icon"><i class="fas fa-qrcode"></i></div>
             <div class="kpi-info">
               <span class="kpi-label">Escaneou</span>
-              <span class="kpi-value" data-count="365">0</span>
-              <span class="kpi-sub">95,05% de scan success</span>
+              <span class="kpi-value" data-count="639">0</span>
+              <span class="kpi-sub">94,95% de scan success</span>
+            </div>
+          </div>
+
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-icon"><i class="fas fa-cart-shopping"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-label">CPFs que compraram</span>
+              <span class="kpi-value" data-count="36">0</span>
+              <span class="kpi-sub">5,63% de quem escaneou</span>
             </div>
           </div>
 
@@ -407,7 +407,7 @@
         </div>
 
         <div class="section-title-bar" style="margin-top:2rem">
-          <h2>📅 Etapas do CRM — jogo e scan</h2>
+          <h2>📅 Etapas do CRM — scan e compra</h2>
         </div>
 
         <div class="table-scroll">
@@ -417,7 +417,7 @@
                 <th>Etapa</th>
                 <th>Clientes</th>
                 <th>% etapa anterior</th>
-                <th>% do jogo</th>
+                <th>% do scan</th>
               </tr>
             </thead>
             <tbody id="crmDayTableBody"></tbody>
@@ -434,19 +434,19 @@
       <span>🐰 Caça aos Coelhos Condor</span>
       <span>★ Escaneie e ganhe desconto!</span>
       <span>★ 19 produtos participantes</span>
-      <span>★ Dados atualizados até 19/03/2026</span>
+      <span>★ Dados atualizados até 22/03/2026</span>
       <span>★ A Maior Páscoa do Brasil!</span>
       <span>★ Condor Premia</span>
       <span>🐰 Caça aos Coelhos Condor</span>
       <span>★ Escaneie e ganhe desconto!</span>
       <span>★ 19 produtos participantes</span>
-      <span>★ Dados atualizados até 19/03/2026</span>
+      <span>★ Dados atualizados até 22/03/2026</span>
       <span>★ A Maior Páscoa do Brasil!</span>
       <span>★ Condor Premia</span>
     </div>
   </div>
 
-  <script src="js/data.js?v=20260320-data-fix"></script>
-  <script src="js/app.js?v=20260320-data-fix"></script>
+  <script src="js/data.js?v=20260323-data-fix"></script>
+  <script src="js/app.js?v=20260323-data-fix"></script>
 </body>
 </html>
