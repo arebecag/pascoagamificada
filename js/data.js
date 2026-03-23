@@ -36,7 +36,7 @@ const TOTAIS = {
   gamificacaoAbriuJogo: 16752,
   gamificacaoAbriuScan: 673,
   gamificacaoEscaneou: 639,
-  gamificacaoCompletou: 36,
+  gamificacaoCompletou: 57,
   overlap: 0,
   produtosCampanha: 19,
   produtosApp: 17
