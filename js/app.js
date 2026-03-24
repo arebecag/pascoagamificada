@@ -144,7 +144,7 @@ function renderSection(id) {
 }
 
 /**
- * Série completa 01/03 a 22/03
+ * Série completa 01/03 a 23/03
  * - Antes de 13/03: participantes app = 0 e demais clientes = total do dia
  * - 13/03 em diante: participantes app e não participantes conforme planilha
  */
