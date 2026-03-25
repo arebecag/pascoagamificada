@@ -3,14 +3,12 @@
 //  Versão TV: leitura executiva de participantes, vendas app e vendas totais
 // ============================================================
 
-const hasNativeChart = typeof window !== 'undefined' && typeof window.Chart !== 'undefined';
-
-if (!hasNativeChart) {
-  const FakeChart = function FakeChart() {
+if (typeof globalThis.Chart === 'undefined') {
+  const FallbackChart = function FallbackChart() {
     return { destroy() {} };
   };
-  FakeChart.defaults = { font: {}, color: '#888' };
-  globalThis.Chart = FakeChart;
+  FallbackChart.defaults = { font: {}, color: '#888' };
+  globalThis.Chart = FallbackChart;
 }
 
 Chart.defaults.font.family = "'Inter', sans-serif";
