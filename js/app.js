@@ -57,6 +57,14 @@ function destroyChart(id) {
   }
 }
 
+function hydrateCountersFromDataCount() {
+  document.querySelectorAll('.kpi-value[data-count]').forEach(el => {
+    const target = parseInt(el.dataset.count, 10);
+    if (Number.isNaN(target)) return;
+    el.textContent = fmt(target);
+  });
+}
+
 function animateCounters() {
   document.querySelectorAll('.kpi-value[data-count]').forEach(el => {
     const target = parseInt(el.dataset.count, 10);
@@ -123,25 +131,27 @@ function initNav() {
 }
 
 function renderSection(id) {
-  switch (id) {
-    case 'visao-geral':
-      renderVisaoGeral();
-      break;
-    case 'visao-operacional':
-      renderVisaoOperacional();
-      break;
-    case 'ranking':
-      renderRanking();
-      break;
-    case 'produtos-campanha':
-      renderProdutosCampanha();
-      break;
-    case 'etapas-gamificacao':
-      renderEtapasGamificacao();
-      break;
+  try {
+    switch (id) {
+      case 'visao-geral':
+        renderVisaoGeral();
+        break;
+      case 'visao-operacional':
+        renderVisaoOperacional();
+        break;
+      case 'ranking':
+        renderRanking();
+        break;
+      case 'produtos-campanha':
+        renderProdutosCampanha();
+        break;
+      case 'etapas-gamificacao':
+        renderEtapasGamificacao();
+        break;
+    }
+  } finally {
+    setTimeout(animateCounters, 100);
   }
-
-  setTimeout(animateCounters, 100);
 }
 
 /**
@@ -1165,6 +1175,7 @@ function buildEtapasGamificacaoInsights() {
 document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initNav();
+  hydrateCountersFromDataCount();
   renderVisaoGeral();
   animateCounters();
 });
