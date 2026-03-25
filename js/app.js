@@ -10,6 +10,8 @@ let chartInstances = {};
 let rankMetric = 'itens';
 let currentSection = 'visao-geral';
 let selectedStore = '';
+let filtroGamificacaoLoja = '';
+let filtroGamificacaoProduto = '';
 let appBootstrapped = false;
 const AUTH_KEY = 'dash_auth_email';
 const AUTHORIZED_EMAILS = ['rebeca.guimaraes@condor.com.br'];
@@ -982,6 +984,7 @@ function renderCRM() {
   buildCRMLine();
   buildCRMFunnel();
   buildCRMDayTable();
+  buildGamificacaoLojaTable();
   buildCRMInsights();
 }
 
@@ -1103,6 +1106,140 @@ function buildCRMDayTable() {
       <td>${fmtPct(row.pctBase, 1)}</td>
     </tr>
   `).join('');
+}
+
+
+function initGamificacaoFilters(lojaSelect, produtoSelect) {
+  if (!lojaSelect || !produtoSelect) return;
+
+  if (lojaSelect.dataset.ready !== '1') {
+    const lojaOptions = RESULTADO_GAMIFICACAO_LOJA
+      .map(row => row.loja)
+      .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+    lojaSelect.innerHTML = '<option value="">Todas as lojas</option>'
+      + lojaOptions.map(loja => `<option value="${loja}">${loja}</option>`).join('');
+
+    lojaSelect.addEventListener('change', () => {
+      filtroGamificacaoLoja = lojaSelect.value;
+      buildGamificacaoLojaTable();
+    });
+
+    lojaSelect.dataset.ready = '1';
+  }
+
+  if (produtoSelect.dataset.ready !== '1') {
+    const productSet = new Set();
+    RESULTADO_GAMIFICACAO_LOJA.forEach(row => {
+      row.produtos.forEach(prod => productSet.add(prod.nome));
+    });
+
+    const produtoOptions = [...productSet].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+    produtoSelect.innerHTML = '<option value="">Todos os produtos</option>'
+      + produtoOptions.map(prod => `<option value="${prod}">${prod}</option>`).join('');
+
+    produtoSelect.addEventListener('change', () => {
+      filtroGamificacaoProduto = produtoSelect.value;
+      buildGamificacaoLojaTable();
+    });
+
+    produtoSelect.dataset.ready = '1';
+  }
+
+  lojaSelect.value = filtroGamificacaoLoja;
+  produtoSelect.value = filtroGamificacaoProduto;
+}
+
+function buildGamificacaoLojaTable() {
+  const tbody = document.getElementById('gamificacaoLojaTableBody');
+  const lojaSelect = document.getElementById('filtroLojaGamificacao');
+  const produtoSelect = document.getElementById('filtroProdutoGamificacao');
+  const resumo = document.getElementById('gamificacaoLojaResumo');
+  if (!tbody || !lojaSelect || !produtoSelect || !resumo) return;
+
+  initGamificacaoFilters(lojaSelect, produtoSelect);
+
+  const totalGeral = RESULTADO_GAMIFICACAO_LOJA.reduce((acc, row) => acc + row.total, 0);
+
+  if (filtroGamificacaoLoja) {
+    const lojaData = RESULTADO_GAMIFICACAO_LOJA.find(row => row.loja === filtroGamificacaoLoja);
+    if (!lojaData) {
+      tbody.innerHTML = '';
+      resumo.textContent = 'Loja selecionada não encontrada.';
+      return;
+    }
+
+    const produtos = lojaData.produtos
+      .filter(prod => !filtroGamificacaoProduto || prod.nome === filtroGamificacaoProduto)
+      .sort((a, b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'));
+
+    tbody.innerHTML = produtos.map(prod => {
+      const pct = lojaData.total > 0 ? (prod.qtd / lojaData.total) * 100 : 0;
+      return `
+        <tr>
+          <td><strong>${prod.nome}</strong></td>
+          <td>${fmt(prod.qtd)}</td>
+          <td>${fmtPct(pct, 1)}</td>
+          <td>Produto dentro de ${lojaData.loja}</td>
+        </tr>
+      `;
+    }).join('');
+
+    resumo.textContent = `${fmt(lojaData.total)} itens na loja ${lojaData.loja}. Clique em “Todas as lojas” para voltar ao consolidado.`;
+    return;
+  }
+
+  if (filtroGamificacaoProduto) {
+    const rankingProduto = RESULTADO_GAMIFICACAO_LOJA
+      .map(row => {
+        const found = row.produtos.find(prod => prod.nome === filtroGamificacaoProduto);
+        return {
+          loja: row.loja,
+          qtd: found ? found.qtd : 0
+        };
+      })
+      .filter(row => row.qtd > 0)
+      .sort((a, b) => b.qtd - a.qtd || a.loja.localeCompare(b.loja, 'pt-BR'));
+
+    tbody.innerHTML = rankingProduto.map(row => `
+      <tr class="row-loja-click" data-loja="${row.loja}" style="cursor:pointer">
+        <td><strong>${row.loja}</strong></td>
+        <td>${fmt(row.qtd)}</td>
+        <td>${fmtPct((row.qtd / totalGeral) * 100, 1)}</td>
+        <td>Clique para ver os produtos da loja</td>
+      </tr>
+    `).join('');
+
+    const top = rankingProduto[0];
+    resumo.textContent = top
+      ? `Loja que mais vendeu ${filtroGamificacaoProduto}: ${top.loja} (${fmt(top.qtd)}).`
+      : 'Nenhuma loja vendeu este produto.';
+  } else {
+    const lojas = [...RESULTADO_GAMIFICACAO_LOJA].sort((a, b) => b.total - a.total || a.loja.localeCompare(b.loja, 'pt-BR'));
+
+    tbody.innerHTML = lojas.map(row => {
+      const topProd = [...row.produtos].sort((a, b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'))[0];
+      return `
+        <tr class="row-loja-click" data-loja="${row.loja}" style="cursor:pointer">
+          <td><strong>${row.loja}</strong></td>
+          <td>${fmt(row.total)}</td>
+          <td>${fmtPct((row.total / totalGeral) * 100, 1)}</td>
+          <td>${topProd ? `Top produto: ${topProd.nome} (${fmt(topProd.qtd)})` : '-'}</td>
+        </tr>
+      `;
+    }).join('');
+
+    resumo.textContent = `Total geral da base de lojas: ${fmt(totalGeral)} itens.`;
+  }
+
+  tbody.querySelectorAll('tr.row-loja-click').forEach(row => {
+    row.addEventListener('click', () => {
+      filtroGamificacaoLoja = row.dataset.loja || '';
+      lojaSelect.value = filtroGamificacaoLoja;
+      buildGamificacaoLojaTable();
+    });
+  });
 }
 
 function buildCRMInsights() {
