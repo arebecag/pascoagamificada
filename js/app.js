@@ -3,6 +3,16 @@
 //  Versão TV: leitura executiva de participantes, vendas app e vendas totais
 // ============================================================
 
+const hasNativeChart = typeof window !== 'undefined' && typeof window.Chart !== 'undefined';
+
+if (!hasNativeChart) {
+  const FakeChart = function FakeChart() {
+    return { destroy() {} };
+  };
+  FakeChart.defaults = { font: {}, color: '#888' };
+  globalThis.Chart = FakeChart;
+}
+
 Chart.defaults.font.family = "'Inter', sans-serif";
 Chart.defaults.color = '#888';
 
@@ -55,6 +65,14 @@ function destroyChart(id) {
     chartInstances[id].destroy();
     delete chartInstances[id];
   }
+}
+
+function hydrateCountersFromDataCount() {
+  document.querySelectorAll('.kpi-value[data-count]').forEach(el => {
+    const target = parseInt(el.dataset.count, 10);
+    if (Number.isNaN(target)) return;
+    el.textContent = fmt(target);
+  });
 }
 
 function animateCounters() {
@@ -122,25 +140,27 @@ function initNav() {
 }
 
 function renderSection(id) {
-  switch (id) {
-    case 'visao-geral':
-      renderVisaoGeral();
-      break;
-    case 'visao-operacional':
-      renderVisaoOperacional();
-      break;
-    case 'ranking':
-      renderRanking();
-      break;
-    case 'produtos-campanha':
-      renderProdutosCampanha();
-      break;
-    case 'operacional-crm':
-      renderCRM();
-      break;
+  try {
+    switch (id) {
+      case 'visao-geral':
+        renderVisaoGeral();
+        break;
+      case 'visao-operacional':
+        renderVisaoOperacional();
+        break;
+      case 'ranking':
+        renderRanking();
+        break;
+      case 'produtos-campanha':
+        renderProdutosCampanha();
+        break;
+      case 'etapas-gamificacao':
+        renderEtapasGamificacao();
+        break;
+    }
+  } finally {
+    setTimeout(animateCounters, 100);
   }
-
-  setTimeout(animateCounters, 100);
 }
 
 /**
@@ -720,16 +740,16 @@ function buildStoresTable() {
 //  RANKING
 // ═══════════════════════════════════════════════════════════════
 function renderRanking() {
-  buildRankingChart(rankMetric);
-  buildRankingTable(rankMetric);
+  safeCall('gráfico de ranking', () => buildRankingChart(rankMetric));
+  safeCall('tabela de ranking', () => buildRankingTable(rankMetric));
 
   document.querySelectorAll('.toggle-btn').forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       rankMetric = btn.dataset.metric;
-      buildRankingChart(rankMetric);
-      buildRankingTable(rankMetric);
+      safeCall('gráfico de ranking', () => buildRankingChart(rankMetric));
+      safeCall('tabela de ranking', () => buildRankingTable(rankMetric));
     };
   });
 }
@@ -823,8 +843,8 @@ function buildRankingTable(metric) {
 //  PRODUTOS CAMPANHA
 // ═══════════════════════════════════════════════════════════════
 function renderProdutosCampanha() {
-  buildProductsGrid(PRODUTOS_CAMPANHA);
-  buildProdTable(PRODUTOS_CAMPANHA);
+  safeCall('grid de produtos', () => buildProductsGrid(PRODUTOS_CAMPANHA));
+  safeCall('tabela de produtos', () => buildProdTable(PRODUTOS_CAMPANHA));
 
   const searchInput = document.getElementById('productSearch');
   if (searchInput) {
@@ -836,8 +856,8 @@ function renderProdutosCampanha() {
         String(p.id).includes(q)
       );
 
-      buildProductsGrid(filtered);
-      buildProdTable(filtered);
+      safeCall('grid de produtos filtrado', () => buildProductsGrid(filtered));
+      safeCall('tabela de produtos filtrada', () => buildProdTable(filtered));
     };
   }
 }
@@ -897,18 +917,20 @@ function buildProdTable(data) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  OPERACIONAL CRM
+//  ETAPAS GAMIFICAÇÃO
 // ═══════════════════════════════════════════════════════════════
-function renderCRM() {
-  buildCRMLine();
-  buildCRMFunnel();
-  buildCRMDayTable();
-  buildCRMInsights();
+function renderEtapasGamificacao() {
+  safeCall('gráfico de etapas da gamificação', buildEtapasGamificacaoLine);
+  safeCall('donut de sucesso da etapa', buildEtapasGamificacaoFunnel);
+  safeCall('tabela de etapas da gamificação', buildEtapasGamificacaoDayTable);
+  safeCall('ranking de produtos da gamificação', buildGamificacaoProdutoRankingTable);
+  safeCall('resultado da gamificação por loja', buildGamificacaoLojaTable);
+  safeCall('insights da gamificação', buildEtapasGamificacaoInsights);
 }
 
-function buildCRMLine() {
-  destroyChart('chartCRMDiario');
-  const ctx = document.getElementById('chartCRMDiario');
+function buildEtapasGamificacaoLine() {
+  destroyChart('chartGamificacaoDiario');
+  const ctx = document.getElementById('chartGamificacaoDiario');
   if (!ctx) return;
 
   chartInstances.chartCRMDiario = new Chart(ctx, {
@@ -951,9 +973,9 @@ function buildCRMLine() {
   });
 }
 
-function buildCRMFunnel() {
-  destroyChart('chartCRMFunil');
-  const ctx = document.getElementById('chartCRMFunil');
+function buildEtapasGamificacaoFunnel() {
+  destroyChart('chartGamificacaoFunil');
+  const ctx = document.getElementById('chartGamificacaoFunil');
   if (!ctx) return;
 
   const value = TOTAIS.gamificacaoEscaneou;
@@ -991,8 +1013,8 @@ function buildCRMFunnel() {
   });
 }
 
-function buildCRMDayTable() {
-  const tbody = document.getElementById('crmDayTableBody');
+function buildEtapasGamificacaoDayTable() {
+  const tbody = document.getElementById('gamificacaoDayTableBody');
   if (!tbody) return;
 
   const rows = [
@@ -1026,9 +1048,7 @@ function buildCRMDayTable() {
   `).join('');
 }
 
-function buildCRMInsights() {
-  const container = document.getElementById('crmInsights');
-  if (!container) return;
+function buildEtapasGamificacaoInsights() {
 
   const pctAbriuScan = (TOTAIS.gamificacaoAbriuScan / TOTAIS.gamificacaoAbriuJogo) * 100;
   const pctEscaneou = (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100;

@@ -84,7 +84,7 @@
 
           <a href="#" class="nav-item" data-section="produtos-campanha">
             <i class="fas fa-egg"></i>
-            <span>Produtos Gameficação</span>
+            <span>Produtos Gamificação</span>
           </a>
         </nav>
       </div>
@@ -131,7 +131,7 @@
             </div>
           </div>
 
-          <div class="kpi-card kpi-pink">
+          <div class="kpi-card kpi-green">
             <div class="kpi-icon"><i class="fas fa-store"></i></div>
             <div class="kpi-info">
               <span class="kpi-label">Total de lojas ativas na campanha</span>
@@ -348,11 +348,11 @@
         </div>
       </section>
 
-      <!-- ===================== OPERACIONAL CRM ===================== -->
-      <section class="page-section" id="operacional-crm">
+      <!-- ===================== ETAPAS GAMIFICAÇÃO ===================== -->
+      <section class="page-section" id="etapas-gamificacao">
         <div class="section-page-header">
           <h2><i class="fas fa-users-gear"></i> Operacional CRM</h2>
-          <p>Visão da gamificação no CRM e avanço do funil do jogo</p>
+          <p>Visão da gamificação e avanço do funil do jogo</p>
         </div>
 
         <div class="kpi-row">
@@ -392,7 +392,7 @@
               <p class="chart-sub">Etapas acumuladas da jornada no CRM</p>
             </div>
             <div class="chart-body" style="height:250px">
-              <canvas id="chartCRMDiario"></canvas>
+              <canvas id="chartGamificacaoDiario"></canvas>
             </div>
           </div>
 
@@ -401,17 +401,17 @@
               <h3><i class="fas fa-circle-half-stroke"></i> Scan success</h3>
             </div>
             <div class="chart-body chart-center-body" style="height:220px">
-              <canvas id="chartCRMFunil"></canvas>
+              <canvas id="chartGamificacaoFunil"></canvas>
             </div>
           </div>
         </div>
 
         <div class="section-title-bar" style="margin-top:2rem">
-          <h2>📅 Etapas do CRM — scan e compra</h2>
+          <h2>📅 Etapas Gameficação </h2>
         </div>
 
         <div class="table-scroll">
-          <table class="rank-table" id="crmDayTable">
+          <table class="rank-table" id="gamificacaoDayTable">
             <thead>
               <tr>
                 <th>Etapa</th>
@@ -420,11 +420,13 @@
                 <th>% do scan</th>
               </tr>
             </thead>
-            <tbody id="crmDayTableBody"></tbody>
+            <tbody id="gamificacaoLojaTableBody"></tbody>
           </table>
         </div>
 
-        <div class="crm-insights" id="crmInsights"></div>
+        <div class="chart-sub" id="gamificacaoLojaResumo" style="margin-top:0.7rem"></div>
+
+        <div class="gamificacao-insights" id="gamificacaoInsights"></div>
       </section>
     </main>
   </div>

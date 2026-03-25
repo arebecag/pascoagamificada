@@ -215,6 +215,499 @@ const RANKING_LOJAS_DENTRO = [
   { loja: '86. Condor S.J.Pinhais Rui Barbosa', qtd: 240, tickets: 178, clientes: 169 }
 ];
 
+
+const RANKING_PRODUTOS_GAMIFICACAO = [
+  { produto: 'Amandita Lacta Choc.200g', qtd: 76 },
+  { produto: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 42 },
+  { produto: 'Choc.Lacta Ao Leite 145g', qtd: 31 },
+  { produto: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 26 },
+  { produto: 'Choc.Lacta Laka 80g', qtd: 26 },
+  { produto: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 24 },
+  { produto: 'Choc.Lacta Shot 145g', qtd: 23 },
+  { produto: 'Choc.Lacta Ouro Bco 98g', qtd: 20 },
+  { produto: 'Choc.Lacta Laka 145g', qtd: 15 },
+  { produto: 'Choc.Lacta Shot 80g', qtd: 13 },
+  { produto: 'Choc.Lacta Ao Leite 80g', qtd: 10 },
+  { produto: 'Choc.Lacta Laka/Oreo 145g', qtd: 10 },
+  { produto: 'Choc.Lacta Diamante Negro 145g', qtd: 10 },
+  { produto: 'Choc.Lacta Amaro 145g', qtd: 7 },
+  { produto: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 6 },
+  { produto: 'Choc.Lacta Diamante Negro/Laka 80g', qtd: 4 }
+];
+
+
+
+const RESULTADO_GAMIFICACAO_LOJA = [
+  { loja: '65 - Rio Negro', total: 61, produtos: [
+    { nome: 'Amandita Lacta Choc.200g', qtd: 61 }
+  ]},
+  { loja: '52 - Mafra - Centro', total: 47, produtos: [
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 10 },
+    { nome: 'Choc.Lacta Shot 145g', qtd: 9 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 8 },
+    { nome: 'Choc.Lacta Amaro 145g', qtd: 4 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 3 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 3 },
+    { nome: 'Choc.Lacta Laka 145g', qtd: 3 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 2 },
+    { nome: 'Amandita Lacta Choc.200g', qtd: 2 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 2 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 1 }
+  ]},
+  { loja: '46 - Campo Largo - Sao Jose', total: 32, produtos: [
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 12 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 7 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 5 },
+    { nome: 'Choc.Lacta Laka 145g', qtd: 5 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 2 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '6 - Pinheirinho', total: 24, produtos: [
+    { nome: 'Choc.Lacta Shot 80g', qtd: 6 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 4 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 4 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 3 },
+    { nome: 'Choc.Lacta Shot 145g', qtd: 2 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 145g', qtd: 1 }
+  ]},
+  { loja: '32 - Ponta Grossa - Uvaranas', total: 21, produtos: [
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 10 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 3 },
+    { nome: 'Amandita Lacta Choc.200g', qtd: 3 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 80g', qtd: 2 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 1 }
+  ]},
+  { loja: '21 - Nilo Pecanha', total: 14, produtos: [
+    { nome: 'Amandita Lacta Choc.200g', qtd: 4 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 2 },
+    { nome: 'Choc.Lacta Shot 80g', qtd: 2 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 2 },
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 2 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 1 },
+    { nome: 'Choc.Lacta Amaro 145g', qtd: 1 }
+  ]},
+  { loja: '25 - Paranagua - Raia', total: 13, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 4 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 1 }
+  ]},
+  { loja: '8 - Paranagua - Centro', total: 13, produtos: [
+    { nome: 'Choc.Lacta Shot 145g', qtd: 6 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 4 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro 145g', qtd: 1 }
+  ]},
+  { loja: '48 - Joinville - Itaum', total: 12, produtos: [
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 3 },
+    { nome: 'Amandita Lacta Choc.200g', qtd: 3 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Amaro 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 1 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 }
+  ]},
+  { loja: '56 - Piraquara', total: 11, produtos: [
+    { nome: 'Choc.Lacta Shot 145g', qtd: 2 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 2 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Shot 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 }
+  ]},
+  { loja: '42 - Ponta Grossa - Jardim Carvalho', total: 10, produtos: [
+    { nome: 'Choc.Lacta Laka 80g', qtd: 5 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 3 },
+    { nome: 'Amandita Lacta Choc.200g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 }
+  ]},
+  { loja: '33 - Sao Jose - Rua Joinville', total: 8, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 3 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 2 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 1 },
+    { nome: 'Choc.Lacta Shot 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 145g', qtd: 1 }
+  ]},
+  { loja: '63 - Maringa - Av Kakogawa', total: 7, produtos: [
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 4 },
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 2 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 }
+  ]},
+  { loja: '30 - Fazenda Rio Grande', total: 6, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 2 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '20 - Maringa - Av Parana', total: 6, produtos: [
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 4 },
+    { nome: 'Choc.Lacta Shot 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '82 - Condor Cic Jk', total: 6, produtos: [
+    { nome: 'Choc.Lacta Diamante Negro 145g', qtd: 6 }
+  ]},
+  { loja: '43 - Almirante Tamandare', total: 6, produtos: [
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 4 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 2 }
+  ]},
+  { loja: '27 - Novo Mundo', total: 6, produtos: [
+    { nome: 'Choc.Lacta Laka 145g', qtd: 3 },
+    { nome: 'Choc.Lacta Shot 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Amaro 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '29 - Agua Verde', total: 4, produtos: [
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 2 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '24 - Santa Candida', total: 4, produtos: [
+    { nome: 'Choc.Lacta Laka 80g', qtd: 2 },
+    { nome: 'Amandita Lacta Choc.200g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 1 }
+  ]},
+  { loja: '4 - Lapa', total: 4, produtos: [
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 3 },
+    { nome: 'Choc.Lacta Shot 145g', qtd: 1 }
+  ]},
+  { loja: '67 - Ponta Grossa - Ernesto Vilela', total: 3, produtos: [
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Shot 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 1 }
+  ]},
+  { loja: '83 - Condor Merces', total: 3, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 2 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 1 }
+  ]},
+  { loja: '23 - Araucaria BR', total: 3, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro 145g', qtd: 1 }
+  ]},
+  { loja: '37 - Cajuru', total: 2, produtos: [
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 1 }
+  ]},
+  { loja: '14 - Sao Jose Dos Pinhais', total: 2, produtos: [
+    { nome: 'Choc.Lacta Laka 80g', qtd: 2 }
+  ]},
+  { loja: '28 - Cristo Rei', total: 2, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 2 }
+  ]},
+  { loja: '7 - Marechal', total: 2, produtos: [
+    { nome: 'Choc.Lacta Shot 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 }
+  ]},
+  { loja: '17 - Ahu', total: 1, produtos: [
+    { nome: 'Amandita Lacta Choc.200g', qtd: 1 }
+  ]},
+  { loja: '22 - Champagnat', total: 1, produtos: [
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 }
+  ]},
+  { loja: '66 - Barreirinha', total: 1, produtos: [
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '71 - Araucaria Capela Velha', total: 1, produtos: [
+    { nome: 'Choc.Lacta Shot 80g', qtd: 1 }
+  ]},
+  { loja: '54 - Francisco Derosso', total: 1, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 1 }
+  ]},
+  { loja: '60 - Maringa - Av Dr Luiz Teixeira', total: 1, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 1 }
+  ]},
+  { loja: '13 - Sitio Cercado', total: 1, produtos: [
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '45 - Araucaria Costeira', total: 1, produtos: [
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 1 }
+  ]},
+  { loja: '10 - Campo Comprido', total: 1, produtos: [
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 }
+  ]},
+  { loja: '64 - Gralha Azul', total: 1, produtos: [
+    { nome: 'Choc.Lacta Shot 80g', qtd: 1 }
+  ]},
+  { loja: '11 - Sao Braz', total: 1, produtos: [
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 }
+  ]}
+];
+
+
+const RANKING_PRODUTOS_GAMIFICACAO = [
+  { produto: 'Amandita Lacta Choc.200g', qtd: 76 },
+  { produto: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 42 },
+  { produto: 'Choc.Lacta Ao Leite 145g', qtd: 31 },
+  { produto: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 26 },
+  { produto: 'Choc.Lacta Laka 80g', qtd: 26 },
+  { produto: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 24 },
+  { produto: 'Choc.Lacta Shot 145g', qtd: 23 },
+  { produto: 'Choc.Lacta Ouro Bco 98g', qtd: 20 },
+  { produto: 'Choc.Lacta Laka 145g', qtd: 15 },
+  { produto: 'Choc.Lacta Shot 80g', qtd: 13 },
+  { produto: 'Choc.Lacta Ao Leite 80g', qtd: 10 },
+  { produto: 'Choc.Lacta Laka/Oreo 145g', qtd: 10 },
+  { produto: 'Choc.Lacta Diamante Negro 145g', qtd: 10 },
+  { produto: 'Choc.Lacta Amaro 145g', qtd: 7 },
+  { produto: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 6 },
+  { produto: 'Choc.Lacta Diamante Negro/Laka 80g', qtd: 4 }
+];
+
+
+const RANKING_PRODUTOS_GAMIFICACAO = [
+  { produto: 'Amandita Lacta Choc.200g', qtd: 76 },
+  { produto: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 42 },
+  { produto: 'Choc.Lacta Ao Leite 145g', qtd: 31 },
+  { produto: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 26 },
+  { produto: 'Choc.Lacta Laka 80g', qtd: 26 },
+  { produto: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 24 },
+  { produto: 'Choc.Lacta Shot 145g', qtd: 23 },
+  { produto: 'Choc.Lacta Ouro Bco 98g', qtd: 20 },
+  { produto: 'Choc.Lacta Laka 145g', qtd: 15 },
+  { produto: 'Choc.Lacta Shot 80g', qtd: 13 },
+  { produto: 'Choc.Lacta Ao Leite 80g', qtd: 10 },
+  { produto: 'Choc.Lacta Laka/Oreo 145g', qtd: 10 },
+  { produto: 'Choc.Lacta Diamante Negro 145g', qtd: 10 },
+  { produto: 'Choc.Lacta Amaro 145g', qtd: 7 },
+  { produto: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 6 },
+  { produto: 'Choc.Lacta Diamante Negro/Laka 80g', qtd: 4 }
+];
+
+
+
+const RESULTADO_GAMIFICACAO_LOJA = [
+  { loja: '65 - Rio Negro', total: 61, produtos: [
+    { nome: 'Amandita Lacta Choc.200g', qtd: 61 }
+  ]},
+  { loja: '52 - Mafra - Centro', total: 47, produtos: [
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 10 },
+    { nome: 'Choc.Lacta Shot 145g', qtd: 9 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 8 },
+    { nome: 'Choc.Lacta Amaro 145g', qtd: 4 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 3 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 3 },
+    { nome: 'Choc.Lacta Laka 145g', qtd: 3 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 2 },
+    { nome: 'Amandita Lacta Choc.200g', qtd: 2 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 2 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 1 }
+  ]},
+  { loja: '46 - Campo Largo - Sao Jose', total: 32, produtos: [
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 12 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 7 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 5 },
+    { nome: 'Choc.Lacta Laka 145g', qtd: 5 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 2 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '6 - Pinheirinho', total: 24, produtos: [
+    { nome: 'Choc.Lacta Shot 80g', qtd: 6 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 4 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 4 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 3 },
+    { nome: 'Choc.Lacta Shot 145g', qtd: 2 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 145g', qtd: 1 }
+  ]},
+  { loja: '32 - Ponta Grossa - Uvaranas', total: 21, produtos: [
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 10 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 3 },
+    { nome: 'Amandita Lacta Choc.200g', qtd: 3 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 80g', qtd: 2 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 1 }
+  ]},
+  { loja: '21 - Nilo Pecanha', total: 14, produtos: [
+    { nome: 'Amandita Lacta Choc.200g', qtd: 4 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 2 },
+    { nome: 'Choc.Lacta Shot 80g', qtd: 2 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 2 },
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 2 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 1 },
+    { nome: 'Choc.Lacta Amaro 145g', qtd: 1 }
+  ]},
+  { loja: '25 - Paranagua - Raia', total: 13, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 4 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 1 }
+  ]},
+  { loja: '8 - Paranagua - Centro', total: 13, produtos: [
+    { nome: 'Choc.Lacta Shot 145g', qtd: 6 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 4 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro 145g', qtd: 1 }
+  ]},
+  { loja: '48 - Joinville - Itaum', total: 12, produtos: [
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 3 },
+    { nome: 'Amandita Lacta Choc.200g', qtd: 3 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Amaro 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 1 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 }
+  ]},
+  { loja: '56 - Piraquara', total: 11, produtos: [
+    { nome: 'Choc.Lacta Shot 145g', qtd: 2 },
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 2 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Shot 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 }
+  ]},
+  { loja: '42 - Ponta Grossa - Jardim Carvalho', total: 10, produtos: [
+    { nome: 'Choc.Lacta Laka 80g', qtd: 5 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 3 },
+    { nome: 'Amandita Lacta Choc.200g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 }
+  ]},
+  { loja: '33 - Sao Jose - Rua Joinville', total: 8, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 3 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 2 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 1 },
+    { nome: 'Choc.Lacta Shot 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 145g', qtd: 1 }
+  ]},
+  { loja: '63 - Maringa - Av Kakogawa', total: 7, produtos: [
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 4 },
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 2 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 }
+  ]},
+  { loja: '30 - Fazenda Rio Grande', total: 6, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 2 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka/Oreo 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '20 - Maringa - Av Parana', total: 6, produtos: [
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 4 },
+    { nome: 'Choc.Lacta Shot 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '82 - Condor Cic Jk', total: 6, produtos: [
+    { nome: 'Choc.Lacta Diamante Negro 145g', qtd: 6 }
+  ]},
+  { loja: '43 - Almirante Tamandare', total: 6, produtos: [
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 4 },
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 2 }
+  ]},
+  { loja: '27 - Novo Mundo', total: 6, produtos: [
+    { nome: 'Choc.Lacta Laka 145g', qtd: 3 },
+    { nome: 'Choc.Lacta Shot 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Amaro 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '29 - Agua Verde', total: 4, produtos: [
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 2 },
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '24 - Santa Candida', total: 4, produtos: [
+    { nome: 'Choc.Lacta Laka 80g', qtd: 2 },
+    { nome: 'Amandita Lacta Choc.200g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 80g', qtd: 1 }
+  ]},
+  { loja: '4 - Lapa', total: 4, produtos: [
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 3 },
+    { nome: 'Choc.Lacta Shot 145g', qtd: 1 }
+  ]},
+  { loja: '67 - Ponta Grossa - Ernesto Vilela', total: 3, produtos: [
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Shot 80g', qtd: 1 },
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 1 }
+  ]},
+  { loja: '83 - Condor Merces', total: 3, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 2 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 1 }
+  ]},
+  { loja: '23 - Araucaria BR', total: 3, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 1 },
+    { nome: 'Choc.Lacta Laka 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro 145g', qtd: 1 }
+  ]},
+  { loja: '37 - Cajuru', total: 2, produtos: [
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 1 },
+    { nome: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 1 }
+  ]},
+  { loja: '14 - Sao Jose Dos Pinhais', total: 2, produtos: [
+    { nome: 'Choc.Lacta Laka 80g', qtd: 2 }
+  ]},
+  { loja: '28 - Cristo Rei', total: 2, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 2 }
+  ]},
+  { loja: '7 - Marechal', total: 2, produtos: [
+    { nome: 'Choc.Lacta Shot 145g', qtd: 1 },
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 }
+  ]},
+  { loja: '17 - Ahu', total: 1, produtos: [
+    { nome: 'Amandita Lacta Choc.200g', qtd: 1 }
+  ]},
+  { loja: '22 - Champagnat', total: 1, produtos: [
+    { nome: 'Choc.Lacta Laka 80g', qtd: 1 }
+  ]},
+  { loja: '66 - Barreirinha', total: 1, produtos: [
+    { nome: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '71 - Araucaria Capela Velha', total: 1, produtos: [
+    { nome: 'Choc.Lacta Shot 80g', qtd: 1 }
+  ]},
+  { loja: '54 - Francisco Derosso', total: 1, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 1 }
+  ]},
+  { loja: '60 - Maringa - Av Dr Luiz Teixeira', total: 1, produtos: [
+    { nome: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 1 }
+  ]},
+  { loja: '13 - Sitio Cercado', total: 1, produtos: [
+    { nome: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 1 }
+  ]},
+  { loja: '45 - Araucaria Costeira', total: 1, produtos: [
+    { nome: 'Choc.Lacta Ouro Bco 98g', qtd: 1 }
+  ]},
+  { loja: '10 - Campo Comprido', total: 1, produtos: [
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 }
+  ]},
+  { loja: '64 - Gralha Azul', total: 1, produtos: [
+    { nome: 'Choc.Lacta Shot 80g', qtd: 1 }
+  ]},
+  { loja: '11 - Sao Braz', total: 1, produtos: [
+    { nome: 'Choc.Lacta Ao Leite 145g', qtd: 1 }
+  ]}
+];
 const SALES_DENTRO_MAP = {
   118311: { itens: 1, tickets: 1, clientes: 1 },
   1991454: { itens: 80, tickets: 48, clientes: 48 },
