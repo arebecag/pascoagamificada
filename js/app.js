@@ -138,8 +138,8 @@ function renderSection(id) {
     case 'produtos-campanha':
       renderProdutosCampanha();
       break;
-    case 'operacional-crm':
-      renderCRM();
+    case 'etapas-gamificacao':
+      renderEtapasGamificacao();
       break;
   }
 
@@ -900,22 +900,22 @@ function buildProdTable(data) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  OPERACIONAL CRM
+//  ETAPAS GAMIFICAÇÃO
 // ═══════════════════════════════════════════════════════════════
-function renderCRM() {
-  buildCRMLine();
-  buildCRMFunnel();
-  buildCRMDayTable();
+function renderEtapasGamificacao() {
+  buildEtapasGamificacaoLine();
+  buildEtapasGamificacaoFunnel();
+  buildEtapasGamificacaoDayTable();
   buildGamificacaoLojaTable();
-  buildCRMInsights();
+  buildEtapasGamificacaoInsights();
 }
 
-function buildCRMLine() {
-  destroyChart('chartCRMDiario');
-  const ctx = document.getElementById('chartCRMDiario');
+function buildEtapasGamificacaoLine() {
+  destroyChart('chartGamificacaoDiario');
+  const ctx = document.getElementById('chartGamificacaoDiario');
   if (!ctx) return;
 
-  chartInstances.chartCRMDiario = new Chart(ctx, {
+  chartInstances.chartGamificacaoDiario = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: ['Abriu o jogo', 'Abriu scan', 'Escaneou'],
@@ -955,9 +955,9 @@ function buildCRMLine() {
   });
 }
 
-function buildCRMFunnel() {
-  destroyChart('chartCRMFunil');
-  const ctx = document.getElementById('chartCRMFunil');
+function buildEtapasGamificacaoFunnel() {
+  destroyChart('chartGamificacaoFunil');
+  const ctx = document.getElementById('chartGamificacaoFunil');
   if (!ctx) return;
 
   const value = TOTAIS.gamificacaoEscaneou;
@@ -965,7 +965,7 @@ function buildCRMFunnel() {
   const total = TOTAIS.gamificacaoAbriuScan;
   const pct = total > 0 ? (value / total) * 100 : 0;
 
-  chartInstances.chartCRMFunil = new Chart(ctx, {
+  chartInstances.chartGamificacaoFunil = new Chart(ctx, {
     type: 'doughnut',
     plugins: [getDonutCenterPlugin(fmtPct(pct, 1))],
     data: {
@@ -995,8 +995,8 @@ function buildCRMFunnel() {
   });
 }
 
-function buildCRMDayTable() {
-  const tbody = document.getElementById('crmDayTableBody');
+function buildEtapasGamificacaoDayTable() {
+  const tbody = document.getElementById('gamificacaoDayTableBody');
   if (!tbody) return;
 
   const rows = [
@@ -1164,8 +1164,8 @@ function buildGamificacaoLojaTable() {
   });
 }
 
-function buildCRMInsights() {
-  const container = document.getElementById('crmInsights');
+function buildEtapasGamificacaoInsights() {
+  const container = document.getElementById('gamificacaoInsights');
   if (!container) return;
 
   const pctAbriuScan = (TOTAIS.gamificacaoAbriuScan / TOTAIS.gamificacaoAbriuJogo) * 100;
@@ -1177,7 +1177,7 @@ function buildCRMInsights() {
       icon: 'fas fa-mobile-screen-button',
       type: 'info',
       title: 'Volume de abertura de scan',
-      text: `${fmt(TOTAIS.gamificacaoAbriuScan)} clientes chegaram até a tela de scan no CRM (${fmtPct(pctAbriuScan, 2)} de quem abriu o jogo).`
+      text: `${fmt(TOTAIS.gamificacaoAbriuScan)} clientes chegaram até a tela de scan na gamificação (${fmtPct(pctAbriuScan, 2)} de quem abriu o jogo).`
     },
     {
       icon: 'fas fa-qrcode',
