@@ -19,6 +19,9 @@ Chart.defaults.color = '#888';
 let chartInstances = {};
 let rankMetric = 'itens';
 let currentSection = 'visao-geral';
+let selectedStore = '';
+let filtroGamificacaoLoja = '';
+let filtroGamificacaoProduto = '';
 
 function safeCall(label, fn) {
   try {
@@ -455,6 +458,54 @@ function renderVisaoOperacional() {
   safeCall('donut operacional', buildDonutParticipacao);
   safeCall('tabela diária operacional', buildDailyCampaignTable);
   safeCall('tabela de lojas operacional', buildStoresTable);
+}
+
+
+function buildOperationalTotalizers() {
+  const container = document.getElementById('operationalTotalizers');
+  if (!container) return;
+
+  const cards = [
+    {
+      cls: 'kpi-purple',
+      icon: 'fa-users',
+      label: 'Clientes compraram produtos da campanha',
+      value: fmt(TOTAIS.clientesCompraramCampanha),
+      sub: 'total de clientes da campanha'
+    },
+    {
+      cls: 'kpi-green',
+      icon: 'fa-mobile-screen-button',
+      label: 'Clientes com app',
+      value: fmt(TOTAIS.clientesComAppInstalado),
+      sub: 'base com app identificado'
+    },
+    {
+      cls: 'kpi-orange',
+      icon: 'fa-receipt',
+      label: 'CUPONS VENDAS',
+      value: fmt(TOTAIS.cuponsVendasCampanha),
+      sub: 'volume total de vendas da campanha'
+    },
+    {
+      cls: 'kpi-pink',
+      icon: 'fa-store',
+      label: 'Total de lojas ativas na campanha',
+      value: fmt(TOTAIS.lojasParticipantes),
+      sub: 'lojas ativas no período'
+    }
+  ];
+
+  container.innerHTML = cards.map(card => `
+    <div class="kpi-card ${card.cls}">
+      <div class="kpi-icon"><i class="fas ${card.icon}"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-label">${card.label}</span>
+        <span class="kpi-value">${card.value}</span>
+        <span class="kpi-sub">${card.sub}</span>
+      </div>
+    </div>
+  `).join('');
 }
 
 
