@@ -19,6 +19,9 @@ Chart.defaults.color = '#888';
 let chartInstances = {};
 let rankMetric = 'itens';
 let currentSection = 'visao-geral';
+let selectedStore = '';
+let filtroGamificacaoLoja = '';
+let filtroGamificacaoProduto = '';
 
 function fmt(n) {
   if (typeof n !== 'number') return n;
@@ -445,6 +448,7 @@ function renderVisaoOperacional() {
   buildOperationalTotalizers();
   buildChartOperacional();
   buildDonutParticipacao();
+  initStoreFilter();
   buildDailyCampaignTable();
   buildStoresTable();
 }
