@@ -453,6 +453,26 @@ const RANKING_PRODUTOS_GAMIFICACAO = [
 ];
 
 
+const RANKING_PRODUTOS_GAMIFICACAO = [
+  { produto: 'Amandita Lacta Choc.200g', qtd: 76 },
+  { produto: 'Bombom Lacta Ouro Bco/Sonho Valsa 220g', qtd: 42 },
+  { produto: 'Choc.Lacta Ao Leite 145g', qtd: 31 },
+  { produto: 'Choc.Lacta Ao Leite Rech.Caramelo 104g', qtd: 26 },
+  { produto: 'Choc.Lacta Laka 80g', qtd: 26 },
+  { produto: 'Choc.Lacta Laka Rech.Caramelo 104g', qtd: 24 },
+  { produto: 'Choc.Lacta Shot 145g', qtd: 23 },
+  { produto: 'Choc.Lacta Ouro Bco 98g', qtd: 20 },
+  { produto: 'Choc.Lacta Laka 145g', qtd: 15 },
+  { produto: 'Choc.Lacta Shot 80g', qtd: 13 },
+  { produto: 'Choc.Lacta Ao Leite 80g', qtd: 10 },
+  { produto: 'Choc.Lacta Laka/Oreo 145g', qtd: 10 },
+  { produto: 'Choc.Lacta Diamante Negro 145g', qtd: 10 },
+  { produto: 'Choc.Lacta Amaro 145g', qtd: 7 },
+  { produto: 'Choc.Lacta Diamante Negro/Laka 145g', qtd: 6 },
+  { produto: 'Choc.Lacta Diamante Negro/Laka 80g', qtd: 4 }
+];
+
+
 
 const RESULTADO_GAMIFICACAO_LOJA = [
   { loja: '65 - Rio Negro', total: 61, produtos: [

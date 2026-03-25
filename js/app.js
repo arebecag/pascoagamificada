@@ -690,44 +690,18 @@ function buildStoresTable() {
 
   tbody.innerHTML = LOJAS_OPERACIONAL.map((row, i) => {
     const rowGamificacao = resultadoPorLoja.get(row.loja);
-    const produtos = [...(rowGamificacao?.produtos || [])]
-      .sort((a, b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'));
-    const totalProdutos = produtos.reduce((acc, prod) => acc + prod.qtd, 0);
-    const topProduto = produtos[0];
-
-    const produtosRows = produtos.length
-      ? produtos.map(prod => {
-        const img = getGamificacaoProductImage(prod.nome);
-        const pct = totalProdutos > 0 ? fmtPct((prod.qtd / totalProdutos) * 100, 1) : '0,0%';
-        return `
-          <tr>
-            <td>${img ? `<img src="${img}" alt="${prod.nome}" class="rank-product-thumb"/>` : '<span style="opacity:.55">—</span>'}</td>
-            <td><strong>${prod.nome}</strong></td>
-            <td>${fmt(prod.qtd)}</td>
-            <td>${pct}</td>
-          </tr>
-        `;
-      }).join('')
-      : '<tr><td colspan="4">Sem produtos de gamificação para esta loja.</td></tr>';
+    const topProduto = rowGamificacao && Array.isArray(rowGamificacao.produtos)
+      ? [...rowGamificacao.produtos].sort((a, b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'))[0]
+      : null;
 
     return `
-      <tr class="row-loja-accordion" data-target="store-${i}" style="cursor:pointer">
+      <tr>
         <td class="rank-num">${i + 1}</td>
         <td><strong>${row.loja}</strong></td>
         <td>${fmt(row.clientesCampanha)}</td>
         <td>${fmt(row.clientesComApp)}</td>
         <td>${fmt(row.cuponsVendas)}</td>
-        <td>${topProduto ? `${topProduto.nome} (${fmt(topProduto.qtd)})` : 'Sem dados'} • Clique para abrir</td>
-      </tr>
-      <tr id="store-${i}" class="row-loja-details" style="display:none">
-        <td colspan="6">
-          <table class="rank-table" style="margin:0">
-            <thead>
-              <tr><th>Imagem</th><th>Produto</th><th>Qtde</th><th>% na loja</th></tr>
-            </thead>
-            <tbody>${produtosRows}</tbody>
-          </table>
-        </td>
+        <td>${topProduto ? `${topProduto.nome} (${fmt(topProduto.qtd)})` : 'Sem dados'}</td>
       </tr>
     `;
   }).join('') + `
@@ -739,16 +713,6 @@ function buildStoresTable() {
       <td><strong>Resumo direto da linha acima</strong></td>
     </tr>
   `;
-
-  tbody.querySelectorAll('.row-loja-accordion').forEach(row => {
-    row.addEventListener('click', () => {
-      const target = document.getElementById(row.dataset.target);
-      if (!target) return;
-      const open = target.style.display !== 'none';
-      tbody.querySelectorAll('.row-loja-details').forEach(r => { r.style.display = 'none'; });
-      target.style.display = open ? 'none' : 'table-row';
-    });
-  });
 }
 
 // ═══════════════════════════════════════════════════════════════
