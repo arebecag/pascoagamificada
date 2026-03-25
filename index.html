@@ -77,14 +77,14 @@
             <span>Ranking Produtos</span>
           </a>
 
-          <a href="#" class="nav-item" data-section="operacional-crm">
+          <a href="#" class="nav-item" data-section="etapas-gamificacao">
             <i class="fas fa-users-gear"></i>
-            <span>Resultado Gameficação</span>
+            <span>Resultado Gamificação</span>
           </a>
 
           <a href="#" class="nav-item" data-section="produtos-campanha">
             <i class="fas fa-egg"></i>
-            <span>Produtos Gameficação</span>
+            <span>Produtos Gamificação</span>
           </a>
         </nav>
       </div>
@@ -241,17 +241,9 @@
           </table>
         </div>
 
-        <div class="section-title-bar section-title-with-filter" style="margin-top:2rem">
-          <h2>🏬 Filiais — clientes compraram produtos da campanha, clientes com app e CUPONS VENDAS</h2>
-          <div class="store-filter-wrap">
-            <label for="storeFilter">Filial</label>
-            <div class="store-filter-controls">
-              <select id="storeFilter" class="store-filter-select">
-                <option value="">Todas as lojas</option>
-              </select>
-              <button type="button" id="clearStoreFilter" class="store-filter-clear">Limpar</button>
-            </div>
-          </div>
+        <div class="section-title-bar" style="margin-top:2rem">
+          <h2>🏬 Resultado por loja — clientes da campanha, clientes com app e CUPONS VENDAS</h2>
+          <span class="rank-by-tag">Sanfona por produtos</span>
         </div>
 
         <div class="table-scroll">
@@ -263,6 +255,7 @@
                 <th>Clientes compraram produtos da campanha</th>
                 <th>Clientes com app</th>
                 <th>CUPONS VENDAS</th>
+                <th>Resumo produto</th>
               </tr>
             </thead>
             <tbody id="storesTableBody"></tbody>
@@ -351,8 +344,8 @@
       <!-- ===================== ETAPAS GAMIFICAÇÃO ===================== -->
       <section class="page-section" id="etapas-gamificacao">
         <div class="section-page-header">
-          <h2><i class="fas fa-users-gear"></i> Operacional CRM</h2>
-          <p>Visão da gamificação no CRM e avanço do funil do jogo</p>
+          <h2><i class="fas fa-users-gear"></i> Resultado da Gamificação</h2>
+          <p>Visão das etapas da gamificação e avanço do funil do jogo</p>
         </div>
 
         <div class="kpi-row">
@@ -389,7 +382,7 @@
           <div class="chart-card chart-card-wide">
             <div class="chart-header">
               <h3><i class="fas fa-chart-column"></i> Funil da gamificação</h3>
-              <p class="chart-sub">Etapas acumuladas da jornada no CRM</p>
+              <p class="chart-sub">Etapas acumuladas da jornada na gamificação</p>
             </div>
             <div class="chart-body" style="height:250px">
               <canvas id="chartGamificacaoDiario"></canvas>
@@ -398,7 +391,7 @@
 
           <div class="chart-card chart-card-narrow">
             <div class="chart-header">
-              <h3><i class="fas fa-circle-half-stroke"></i> Scan success</h3>
+              <h3><i class="fas fa-circle-half-stroke"></i> Sucesso da etapa</h3>
             </div>
             <div class="chart-body chart-center-body" style="height:220px">
               <canvas id="chartGamificacaoFunil"></canvas>
@@ -407,7 +400,7 @@
         </div>
 
         <div class="section-title-bar" style="margin-top:2rem">
-          <h2>📅 Etapas do CRM — scan e compra</h2>
+          <h2>📅 Resultado da Gamificação</h2>
         </div>
 
         <div class="table-scroll">
@@ -424,35 +417,36 @@
           </table>
         </div>
 
+        <div class="section-title-bar" style="margin-top:2rem">
+          <h2>🥇 Ranking de Produto da Gamificação</h2>
+        </div>
 
+        <div class="table-scroll" style="margin-top:0.85rem">
+          <table class="rank-table" id="gamificacaoProdutoRankingTable">
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Imagem</th>
+                <th>Qtde</th>
+                <th>% do total</th>
+              </tr>
+            </thead>
+            <tbody id="gamificacaoProdutoRankingBody"></tbody>
+          </table>
+        </div>
 
         <div class="section-title-bar" style="margin-top:2rem">
           <h2>🏬 Resultado Gamificação por Loja</h2>
-        </div>
-
-        <div class="store-filter-row" style="margin-top:0.75rem">
-          <div class="store-filter-control">
-            <label class="store-filter-label" for="filtroLojaGamificacao">Filtrar loja</label>
-            <select id="filtroLojaGamificacao" class="store-filter-select">
-              <option value="">Todas as lojas</option>
-            </select>
-          </div>
-          <div class="store-filter-control">
-            <label class="store-filter-label" for="filtroProdutoGamificacao">Filtrar produto</label>
-            <select id="filtroProdutoGamificacao" class="store-filter-select">
-              <option value="">Todos os produtos</option>
-            </select>
-          </div>
         </div>
 
         <div class="table-scroll" style="margin-top:0.85rem">
           <table class="rank-table" id="gamificacaoLojaTable">
             <thead>
               <tr>
-                <th>Loja / Produto</th>
-                <th>Qtde</th>
+                <th>Loja</th>
+                <th>Qtde por loja</th>
                 <th>% do total</th>
-                <th>Detalhe</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody id="gamificacaoLojaTableBody"></tbody>
@@ -461,7 +455,7 @@
 
         <div class="chart-sub" id="gamificacaoLojaResumo" style="margin-top:0.7rem"></div>
 
-        <div class="crm-insights" id="crmInsights"></div>
+        <div class="gamificacao-insights" id="gamificacaoInsights"></div>
       </section>
     </main>
   </div>
@@ -483,7 +477,7 @@
     </div>
   </div>
 
-  <script src="js/data.js?v=20260325-gamificacao-loja"></script>
-  <script src="js/app.js?v=20260325-gamificacao-loja"></script>
+  <script src="js/data.js?v=20260325-gamificacao-loja-accordion"></script>
+  <script src="js/app.js?v=20260325-gamificacao-loja-accordion"></script>
 </body>
 </html>

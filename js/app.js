@@ -3,6 +3,16 @@
 //  Versão TV: leitura executiva de participantes, vendas app e vendas totais
 // ============================================================
 
+const hasNativeChart = typeof window !== 'undefined' && typeof window.Chart !== 'undefined';
+
+if (!hasNativeChart) {
+  const FakeChart = function FakeChart() {
+    return { destroy() {} };
+  };
+  FakeChart.defaults = { font: {}, color: '#888' };
+  globalThis.Chart = FakeChart;
+}
+
 Chart.defaults.font.family = "'Inter', sans-serif";
 Chart.defaults.color = '#888';
 
@@ -598,13 +608,8 @@ function buildDonutParticipacao() {
   const legend = document.getElementById('operacionalLegend');
   if (!ctx || !legend) return;
 
-  const periodTotals = getOperationalPeriodTotals();
-  const value = selectedStore
-    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore).reduce((sum, row) => sum + row.clientesComApp, 0)
-    : TOTAIS.clientesComAppInstalado;
-  const remainder = selectedStore
-    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore).reduce((sum, row) => sum + row.clientesSemApp, 0)
-    : (TOTAIS.clientesCompraramCampanha - TOTAIS.clientesComAppInstalado);
+  const value = TOTAIS.clientesComAppInstalado;
+  const remainder = TOTAIS.clientesCompraramCampanha - TOTAIS.clientesComAppInstalado;
   const total = value + remainder;
   const pct = total > 0 ? (value / total) * 100 : 0;
 
@@ -665,43 +670,15 @@ function buildDailyCampaignTable() {
   `;
 }
 
-function initStoreFilter() {
-  const select = document.getElementById('storeFilter');
-  const clearButton = document.getElementById('clearStoreFilter');
-  if (!select) return;
-
-  const options = ['<option value="">Todas as lojas</option>']
-    .concat(LOJAS_OPERACIONAL.map(row => `<option value="${row.loja}">${row.loja}</option>`));
-
-  select.innerHTML = options.join('');
-  select.value = selectedStore;
-  select.onchange = () => {
-    selectedStore = select.value;
-    buildOperationalTotalizers();
-    buildDonutParticipacao();
-    buildStoresTable();
-  };
-
-  if (clearButton) {
-    clearButton.onclick = () => {
-      selectedStore = '';
-      select.value = '';
-      buildOperationalTotalizers();
-      buildDonutParticipacao();
-      buildStoresTable();
-    };
-  }
-}
-
 function buildStoresTable() {
   const tbody = document.getElementById('storesTableBody');
   if (!tbody) return;
 
-  const filteredRows = selectedStore
-    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore)
-    : LOJAS_OPERACIONAL;
+  const resultadoPorLoja = new Map(
+    RESULTADO_GAMIFICACAO_LOJA.map(row => [row.loja, row])
+  );
 
-  const totals = filteredRows.reduce((acc, row) => ({
+  const totals = LOJAS_OPERACIONAL.reduce((acc, row) => ({
     clientesCampanha: acc.clientesCampanha + row.clientesCampanha,
     clientesComApp: acc.clientesComApp + row.clientesComApp,
     cuponsVendas: acc.cuponsVendas + row.cuponsVendas
@@ -711,22 +688,67 @@ function buildStoresTable() {
     cuponsVendas: 0
   });
 
-  tbody.innerHTML = filteredRows.map((row, i) => `
-    <tr>
-      <td class="rank-num">${i + 1}</td>
-      <td><strong>${row.loja}</strong></td>
-      <td>${fmt(row.clientesCampanha)}</td>
-      <td>${fmt(row.clientesComApp)}</td>
-      <td>${fmt(row.cuponsVendas)}</td>
-    </tr>
-  `).join('') + `
+  tbody.innerHTML = LOJAS_OPERACIONAL.map((row, i) => {
+    const rowGamificacao = resultadoPorLoja.get(row.loja);
+    const produtos = [...(rowGamificacao?.produtos || [])]
+      .sort((a, b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'));
+    const totalProdutos = produtos.reduce((acc, prod) => acc + prod.qtd, 0);
+    const topProduto = produtos[0];
+
+    const produtosRows = produtos.length
+      ? produtos.map(prod => {
+        const img = getGamificacaoProductImage(prod.nome);
+        const pct = totalProdutos > 0 ? fmtPct((prod.qtd / totalProdutos) * 100, 1) : '0,0%';
+        return `
+          <tr>
+            <td>${img ? `<img src="${img}" alt="${prod.nome}" class="rank-product-thumb"/>` : '<span style="opacity:.55">—</span>'}</td>
+            <td><strong>${prod.nome}</strong></td>
+            <td>${fmt(prod.qtd)}</td>
+            <td>${pct}</td>
+          </tr>
+        `;
+      }).join('')
+      : '<tr><td colspan="4">Sem produtos de gamificação para esta loja.</td></tr>';
+
+    return `
+      <tr class="row-loja-accordion" data-target="store-${i}" style="cursor:pointer">
+        <td class="rank-num">${i + 1}</td>
+        <td><strong>${row.loja}</strong></td>
+        <td>${fmt(row.clientesCampanha)}</td>
+        <td>${fmt(row.clientesComApp)}</td>
+        <td>${fmt(row.cuponsVendas)}</td>
+        <td>${topProduto ? `${topProduto.nome} (${fmt(topProduto.qtd)})` : 'Sem dados'} • Clique para abrir</td>
+      </tr>
+      <tr id="store-${i}" class="row-loja-details" style="display:none">
+        <td colspan="6">
+          <table class="rank-table" style="margin:0">
+            <thead>
+              <tr><th>Imagem</th><th>Produto</th><th>Qtde</th><th>% na loja</th></tr>
+            </thead>
+            <tbody>${produtosRows}</tbody>
+          </table>
+        </td>
+      </tr>
+    `;
+  }).join('') + `
     <tr class="table-total-row">
-      <td colspan="2"><strong>${selectedStore ? 'Total da filial' : 'Total consolidado'}</strong></td>
+      <td colspan="2"><strong>Total consolidado</strong></td>
       <td><strong>${fmt(totals.clientesCampanha)}</strong></td>
       <td><strong>${fmt(totals.clientesComApp)}</strong></td>
       <td><strong>${fmt(totals.cuponsVendas)}</strong></td>
+      <td><strong>Resumo direto da linha acima</strong></td>
     </tr>
   `;
+
+  tbody.querySelectorAll('.row-loja-accordion').forEach(row => {
+    row.addEventListener('click', () => {
+      const target = document.getElementById(row.dataset.target);
+      if (!target) return;
+      const open = target.style.display !== 'none';
+      tbody.querySelectorAll('.row-loja-details').forEach(r => { r.style.display = 'none'; });
+      target.style.display = open ? 'none' : 'table-row';
+    });
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -912,12 +934,13 @@ function buildProdTable(data) {
 // ═══════════════════════════════════════════════════════════════
 //  ETAPAS GAMIFICAÇÃO
 // ═══════════════════════════════════════════════════════════════
-function renderCRM() {
-  buildCRMLine();
-  buildCRMFunnel();
-  buildCRMDayTable();
+function renderEtapasGamificacao() {
+  buildEtapasGamificacaoLine();
+  buildEtapasGamificacaoFunnel();
+  buildEtapasGamificacaoDayTable();
+  buildGamificacaoProdutoRankingTable();
   buildGamificacaoLojaTable();
-  buildCRMInsights();
+  buildEtapasGamificacaoInsights();
 }
 
 function buildEtapasGamificacaoLine() {
@@ -925,7 +948,7 @@ function buildEtapasGamificacaoLine() {
   const ctx = document.getElementById('chartGamificacaoDiario');
   if (!ctx) return;
 
-  chartInstances.chartCRMDiario = new Chart(ctx, {
+  chartInstances.chartGamificacaoDiario = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: ['Abriu o jogo', 'Abriu scan', 'Escaneou'],
@@ -975,7 +998,7 @@ function buildEtapasGamificacaoFunnel() {
   const total = TOTAIS.gamificacaoAbriuScan;
   const pct = total > 0 ? (value / total) * 100 : 0;
 
-  chartInstances.chartCRMFunil = new Chart(ctx, {
+  chartInstances.chartGamificacaoFunil = new Chart(ctx, {
     type: 'doughnut',
     plugins: [getDonutCenterPlugin(fmtPct(pct, 1))],
     data: {
@@ -1041,140 +1064,98 @@ function buildEtapasGamificacaoDayTable() {
 }
 
 
-function initGamificacaoFilters(lojaSelect, produtoSelect) {
-  if (!lojaSelect || !produtoSelect) return;
+function getGamificacaoProductImage(produtoNome) {
+  const normalize = value => (value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const target = normalize(produtoNome);
 
-  if (lojaSelect.dataset.ready !== '1') {
-    const lojaOptions = RESULTADO_GAMIFICACAO_LOJA
-      .map(row => row.loja)
-      .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  const match = PRODUTOS_CAMPANHA.find(item => {
+    const name = normalize(item.name);
+    const shortName = normalize(item.shortName);
+    return name.includes(target) || target.includes(name) || shortName.includes(target) || target.includes(shortName);
+  });
 
-    lojaSelect.innerHTML = '<option value="">Todas as lojas</option>'
-      + lojaOptions.map(loja => `<option value="${loja}">${loja}</option>`).join('');
+  return match?.img || null;
+}
 
-    lojaSelect.addEventListener('change', () => {
-      filtroGamificacaoLoja = lojaSelect.value;
-      buildGamificacaoLojaTable();
-    });
+function buildGamificacaoProdutoRankingTable() {
+  const tbody = document.getElementById('gamificacaoProdutoRankingBody');
+  if (!tbody) return;
 
-    lojaSelect.dataset.ready = '1';
-  }
+  const total = RANKING_PRODUTOS_GAMIFICACAO.reduce((acc, row) => acc + row.qtd, 0);
 
-  if (produtoSelect.dataset.ready !== '1') {
-    const productSet = new Set();
-    RESULTADO_GAMIFICACAO_LOJA.forEach(row => {
-      row.produtos.forEach(prod => productSet.add(prod.nome));
-    });
-
-    const produtoOptions = [...productSet].sort((a, b) => a.localeCompare(b, 'pt-BR'));
-
-    produtoSelect.innerHTML = '<option value="">Todos os produtos</option>'
-      + produtoOptions.map(prod => `<option value="${prod}">${prod}</option>`).join('');
-
-    produtoSelect.addEventListener('change', () => {
-      filtroGamificacaoProduto = produtoSelect.value;
-      buildGamificacaoLojaTable();
-    });
-
-    produtoSelect.dataset.ready = '1';
-  }
-
-  lojaSelect.value = filtroGamificacaoLoja;
-  produtoSelect.value = filtroGamificacaoProduto;
+  tbody.innerHTML = RANKING_PRODUTOS_GAMIFICACAO
+    .sort((a, b) => b.qtd - a.qtd || a.produto.localeCompare(b.produto, 'pt-BR'))
+    .map(row => {
+      const img = getGamificacaoProductImage(row.produto);
+      return `
+        <tr>
+          <td><strong>${row.produto}</strong></td>
+          <td>${img ? `<img src="${img}" alt="${row.produto}" class="rank-product-thumb"/>` : '<span style="opacity:.55">—</span>'}</td>
+          <td>${fmt(row.qtd)}</td>
+          <td>${fmtPct((row.qtd / total) * 100, 1)}</td>
+        </tr>
+      `;
+    }).join('');
 }
 
 function buildGamificacaoLojaTable() {
   const tbody = document.getElementById('gamificacaoLojaTableBody');
-  const lojaSelect = document.getElementById('filtroLojaGamificacao');
-  const produtoSelect = document.getElementById('filtroProdutoGamificacao');
   const resumo = document.getElementById('gamificacaoLojaResumo');
-  if (!tbody || !lojaSelect || !produtoSelect || !resumo) return;
-
-  initGamificacaoFilters(lojaSelect, produtoSelect);
+  if (!tbody || !resumo) return;
 
   const totalGeral = RESULTADO_GAMIFICACAO_LOJA.reduce((acc, row) => acc + row.total, 0);
+  const lojas = [...RESULTADO_GAMIFICACAO_LOJA].sort((a, b) => b.total - a.total || a.loja.localeCompare(b.loja, 'pt-BR'));
 
-  if (filtroGamificacaoLoja) {
-    const lojaData = RESULTADO_GAMIFICACAO_LOJA.find(row => row.loja === filtroGamificacaoLoja);
-    if (!lojaData) {
-      tbody.innerHTML = '';
-      resumo.textContent = 'Loja selecionada não encontrada.';
-      return;
-    }
+  tbody.innerHTML = lojas.map((row, idx) => {
+    const topProd = [...row.produtos].sort((a, b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'))[0];
+    const produtosRows = [...row.produtos]
+      .sort((a, b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'))
+      .map(prod => `<tr><td>${prod.nome}</td><td>${fmt(prod.qtd)}</td><td>${fmtPct((prod.qtd / row.total) * 100, 1)}</td></tr>`)
+      .join('');
 
-    const produtos = lojaData.produtos
-      .filter(prod => !filtroGamificacaoProduto || prod.nome === filtroGamificacaoProduto)
-      .sort((a, b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'));
-
-    tbody.innerHTML = produtos.map(prod => {
-      const pct = lojaData.total > 0 ? (prod.qtd / lojaData.total) * 100 : 0;
-      return `
-        <tr>
-          <td><strong>${prod.nome}</strong></td>
-          <td>${fmt(prod.qtd)}</td>
-          <td>${fmtPct(pct, 1)}</td>
-          <td>Produto dentro de ${lojaData.loja}</td>
-        </tr>
-      `;
-    }).join('');
-
-    resumo.textContent = `${fmt(lojaData.total)} itens na loja ${lojaData.loja}. Clique em “Todas as lojas” para voltar ao consolidado.`;
-    return;
-  }
-
-  if (filtroGamificacaoProduto) {
-    const rankingProduto = RESULTADO_GAMIFICACAO_LOJA
-      .map(row => {
-        const found = row.produtos.find(prod => prod.nome === filtroGamificacaoProduto);
-        return {
-          loja: row.loja,
-          qtd: found ? found.qtd : 0
-        };
-      })
-      .filter(row => row.qtd > 0)
-      .sort((a, b) => b.qtd - a.qtd || a.loja.localeCompare(b.loja, 'pt-BR'));
-
-    tbody.innerHTML = rankingProduto.map(row => `
-      <tr class="row-loja-click" data-loja="${row.loja}" style="cursor:pointer">
+    return `
+      <tr class="row-loja-accordion" data-target="loja-${idx}" style="cursor:pointer">
         <td><strong>${row.loja}</strong></td>
-        <td>${fmt(row.qtd)}</td>
-        <td>${fmtPct((row.qtd / totalGeral) * 100, 1)}</td>
-        <td>Clique para ver os produtos da loja</td>
+        <td>${fmt(row.total)}</td>
+        <td>${fmtPct((row.total / totalGeral) * 100, 1)}</td>
+        <td>${topProd ? `Top: ${topProd.nome} (${fmt(topProd.qtd)})` : 'Sem produtos'} • Clique para expandir</td>
       </tr>
-    `).join('');
+      <tr id="loja-${idx}" class="row-loja-details" style="display:none">
+        <td colspan="4">
+          <table class="rank-table" style="margin:0">
+            <thead>
+              <tr><th>Produto</th><th>Qtde</th><th>% na loja</th></tr>
+            </thead>
+            <tbody>${produtosRows}</tbody>
+          </table>
+        </td>
+      </tr>
+    `;
+  }).join('');
 
-    const top = rankingProduto[0];
-    resumo.textContent = top
-      ? `Loja que mais vendeu ${filtroGamificacaoProduto}: ${top.loja} (${fmt(top.qtd)}).`
-      : 'Nenhuma loja vendeu este produto.';
-  } else {
-    const lojas = [...RESULTADO_GAMIFICACAO_LOJA].sort((a, b) => b.total - a.total || a.loja.localeCompare(b.loja, 'pt-BR'));
+  const amanditaTop = RESULTADO_GAMIFICACAO_LOJA
+    .map(row => ({ loja: row.loja, qtd: row.produtos.find(p => p.nome === 'Amandita Lacta Choc.200g')?.qtd || 0 }))
+    .sort((a, b) => b.qtd - a.qtd)[0];
 
-    tbody.innerHTML = lojas.map(row => {
-      const topProd = [...row.produtos].sort((a, b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'))[0];
-      return `
-        <tr class="row-loja-click" data-loja="${row.loja}" style="cursor:pointer">
-          <td><strong>${row.loja}</strong></td>
-          <td>${fmt(row.total)}</td>
-          <td>${fmtPct((row.total / totalGeral) * 100, 1)}</td>
-          <td>${topProd ? `Top produto: ${topProd.nome} (${fmt(topProd.qtd)})` : '-'}</td>
-        </tr>
-      `;
-    }).join('');
+  resumo.textContent = amanditaTop && amanditaTop.qtd > 0
+    ? `Resumo direto: loja que mais vendeu Amandita Lacta Choc.200g foi ${amanditaTop.loja} (${fmt(amanditaTop.qtd)} unidades). Total geral: ${fmt(totalGeral)}.`
+    : `Resumo direto: Total geral da base de lojas é ${fmt(totalGeral)} itens.`;
 
-    resumo.textContent = `Total geral da base de lojas: ${fmt(totalGeral)} itens.`;
-  }
-
-  tbody.querySelectorAll('tr.row-loja-click').forEach(row => {
+  tbody.querySelectorAll('.row-loja-accordion').forEach(row => {
     row.addEventListener('click', () => {
-      filtroGamificacaoLoja = row.dataset.loja || '';
-      lojaSelect.value = filtroGamificacaoLoja;
-      buildGamificacaoLojaTable();
+      const target = document.getElementById(row.dataset.target);
+      if (!target) return;
+      const open = target.style.display !== 'none';
+      tbody.querySelectorAll('.row-loja-details').forEach(r => { r.style.display = 'none'; });
+      target.style.display = open ? 'none' : 'table-row';
     });
   });
 }
 
 function buildEtapasGamificacaoInsights() {
+
+  const container = document.getElementById('gamificacaoInsights');
+  if (!container) return;
 
   const pctAbriuScan = (TOTAIS.gamificacaoAbriuScan / TOTAIS.gamificacaoAbriuJogo) * 100;
   const pctEscaneou = (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100;
@@ -1184,14 +1165,14 @@ function buildEtapasGamificacaoInsights() {
     {
       icon: 'fas fa-mobile-screen-button',
       type: 'info',
-      title: 'Volume de abertura de scan',
-      text: `${fmt(TOTAIS.gamificacaoAbriuScan)} clientes chegaram até a tela de scan no CRM (${fmtPct(pctAbriuScan, 2)} de quem abriu o jogo).`
+      title: 'Volume de abertura da etapa',
+      text: `${fmt(TOTAIS.gamificacaoAbriuScan)} clientes chegaram até a etapa de leitura na gamificação (${fmtPct(pctAbriuScan, 2)} de quem abriu o jogo).`
     },
     {
       icon: 'fas fa-qrcode',
       type: 'good',
-      title: 'Scan success muito alto',
-      text: `${fmtPct(pctEscaneou, 2)} de quem abriu scan conseguiu escanear.`
+      title: 'Sucesso da leitura muito alto',
+      text: `${fmtPct(pctEscaneou, 2)} de quem abriu a etapa conseguiu concluir a leitura.`
     },
     {
       icon: 'fas fa-cart-shopping',
