@@ -23,6 +23,14 @@ let selectedStore = '';
 let filtroGamificacaoLoja = '';
 let filtroGamificacaoProduto = '';
 
+function safeCall(label, fn) {
+  try {
+    fn();
+  } catch (error) {
+    console.error(`[dashboard] erro ao renderizar ${label}:`, error);
+  }
+}
+
 function fmt(n) {
   if (typeof n !== 'number') return n;
   return n.toLocaleString('pt-BR');
@@ -197,10 +205,10 @@ function getFullCampaignSeries() {
 //  VISÃO GERAL
 // ═══════════════════════════════════════════════════════════════
 function renderVisaoGeral() {
-  buildPodio();
-  buildStorePodio();
-  buildChartEvolucaoGeral();
-  buildDonutCampanha();
+  safeCall('pódio de produtos', buildPodio);
+  safeCall('pódio de lojas', buildStorePodio);
+  safeCall('gráfico de evolução da visão geral', buildChartEvolucaoGeral);
+  safeCall('funil da visão geral', buildDonutCampanha);
 }
 
 function buildPodio() {
@@ -445,12 +453,59 @@ function getOperationalPeriodTotals() {
 }
 
 function renderVisaoOperacional() {
-  buildOperationalTotalizers();
-  buildChartOperacional();
-  buildDonutParticipacao();
-  initStoreFilter();
-  buildDailyCampaignTable();
-  buildStoresTable();
+  safeCall('cards da visão operacional', buildOperationalTotalizers);
+  safeCall('gráfico operacional', buildChartOperacional);
+  safeCall('donut operacional', buildDonutParticipacao);
+  safeCall('tabela diária operacional', buildDailyCampaignTable);
+  safeCall('tabela de lojas operacional', buildStoresTable);
+}
+
+
+function buildOperationalTotalizers() {
+  const container = document.getElementById('operationalTotalizers');
+  if (!container) return;
+
+  const cards = [
+    {
+      cls: 'kpi-purple',
+      icon: 'fa-users',
+      label: 'Clientes compraram produtos da campanha',
+      value: fmt(TOTAIS.clientesCompraramCampanha),
+      sub: 'total de clientes da campanha'
+    },
+    {
+      cls: 'kpi-green',
+      icon: 'fa-mobile-screen-button',
+      label: 'Clientes com app',
+      value: fmt(TOTAIS.clientesComAppInstalado),
+      sub: 'base com app identificado'
+    },
+    {
+      cls: 'kpi-orange',
+      icon: 'fa-receipt',
+      label: 'CUPONS VENDAS',
+      value: fmt(TOTAIS.cuponsVendasCampanha),
+      sub: 'volume total de vendas da campanha'
+    },
+    {
+      cls: 'kpi-pink',
+      icon: 'fa-store',
+      label: 'Total de lojas ativas na campanha',
+      value: fmt(TOTAIS.lojasParticipantes),
+      sub: 'lojas ativas no período'
+    }
+  ];
+
+  container.innerHTML = cards.map(card => `
+    <div class="kpi-card ${card.cls}">
+      <div class="kpi-icon"><i class="fas ${card.icon}"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-label">${card.label}</span>
+        <span class="kpi-value">${card.value}</span>
+        <span class="kpi-sub">${card.sub}</span>
+      </div>
+    </div>
+  `).join('');
 }
 
 
@@ -719,16 +774,16 @@ function buildStoresTable() {
 //  RANKING
 // ═══════════════════════════════════════════════════════════════
 function renderRanking() {
-  buildRankingChart(rankMetric);
-  buildRankingTable(rankMetric);
+  safeCall('gráfico de ranking', () => buildRankingChart(rankMetric));
+  safeCall('tabela de ranking', () => buildRankingTable(rankMetric));
 
   document.querySelectorAll('.toggle-btn').forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       rankMetric = btn.dataset.metric;
-      buildRankingChart(rankMetric);
-      buildRankingTable(rankMetric);
+      safeCall('gráfico de ranking', () => buildRankingChart(rankMetric));
+      safeCall('tabela de ranking', () => buildRankingTable(rankMetric));
     };
   });
 }
@@ -822,8 +877,8 @@ function buildRankingTable(metric) {
 //  PRODUTOS CAMPANHA
 // ═══════════════════════════════════════════════════════════════
 function renderProdutosCampanha() {
-  buildProductsGrid(PRODUTOS_CAMPANHA);
-  buildProdTable(PRODUTOS_CAMPANHA);
+  safeCall('grid de produtos', () => buildProductsGrid(PRODUTOS_CAMPANHA));
+  safeCall('tabela de produtos', () => buildProdTable(PRODUTOS_CAMPANHA));
 
   const searchInput = document.getElementById('productSearch');
   if (searchInput) {
@@ -835,8 +890,8 @@ function renderProdutosCampanha() {
         String(p.id).includes(q)
       );
 
-      buildProductsGrid(filtered);
-      buildProdTable(filtered);
+      safeCall('grid de produtos filtrado', () => buildProductsGrid(filtered));
+      safeCall('tabela de produtos filtrada', () => buildProdTable(filtered));
     };
   }
 }
@@ -899,12 +954,12 @@ function buildProdTable(data) {
 //  ETAPAS GAMIFICAÇÃO
 // ═══════════════════════════════════════════════════════════════
 function renderEtapasGamificacao() {
-  buildEtapasGamificacaoLine();
-  buildEtapasGamificacaoFunnel();
-  buildEtapasGamificacaoDayTable();
-  buildGamificacaoProdutoRankingTable();
-  buildGamificacaoLojaTable();
-  buildEtapasGamificacaoInsights();
+  safeCall('gráfico de etapas da gamificação', buildEtapasGamificacaoLine);
+  safeCall('donut de sucesso da etapa', buildEtapasGamificacaoFunnel);
+  safeCall('tabela de etapas da gamificação', buildEtapasGamificacaoDayTable);
+  safeCall('ranking de produtos da gamificação', buildGamificacaoProdutoRankingTable);
+  safeCall('resultado da gamificação por loja', buildGamificacaoLojaTable);
+  safeCall('insights da gamificação', buildEtapasGamificacaoInsights);
 }
 
 function buildEtapasGamificacaoLine() {
@@ -1161,9 +1216,9 @@ function buildEtapasGamificacaoInsights() {
 //  INIT
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
-  initMobileMenu();
-  initNav();
-  hydrateCountersFromDataCount();
-  renderVisaoGeral();
-  animateCounters();
+  safeCall('menu mobile', initMobileMenu);
+  safeCall('navegação', initNav);
+  safeCall('hidratação inicial de contadores', hydrateCountersFromDataCount);
+  safeCall('renderização inicial', () => renderSection(currentSection));
+  safeCall('animação de contadores', animateCounters);
 });
