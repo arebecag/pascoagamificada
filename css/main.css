@@ -1246,6 +1246,28 @@ body {
     width: 72px;
   }
 
+  .section-title-with-filter {
+    align-items: flex-start;
+  }
+
+  .store-filter-wrap {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .store-filter-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .store-filter-select,
+  .store-filter-clear {
+    width: 100%;
+    min-width: 0;
+  }
+
   .rank-table,
   .loja-table {
     font-size: 0.76rem;
@@ -1317,16 +1339,4 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: 0 10px 24px rgba(123,63,26,0.18);
-}
-
-
-
-.rank-product-thumb {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-  border-radius: 8px;
-  background: #fff6e9;
-  border: 1px solid rgba(123,63,26,0.15);
-  padding: 3px;
 }

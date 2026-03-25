@@ -16,7 +16,7 @@
     href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css"
   />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="css/main.css?v=20260325-gamificacao-loja" />
+  <link rel="stylesheet" href="css/main.css?v=20260325-data-fix" />
 </head>
 <body>
 
@@ -77,9 +77,9 @@
             <span>Ranking Produtos</span>
           </a>
 
-          <a href="#" class="nav-item" data-section="etapas-gamificacao">
+          <a href="#" class="nav-item" data-section="operacional-crm">
             <i class="fas fa-users-gear"></i>
-            <span>Resultado Gamificação</span>
+            <span>Resultado Gameficação</span>
           </a>
 
           <a href="#" class="nav-item" data-section="produtos-campanha">
@@ -241,9 +241,17 @@
           </table>
         </div>
 
-        <div class="section-title-bar" style="margin-top:2rem">
-          <h2>🏬 Resultado por loja — clientes da campanha, clientes com app e CUPONS VENDAS</h2>
-          <span class="rank-by-tag">Sanfona por produtos</span>
+        <div class="section-title-bar section-title-with-filter" style="margin-top:2rem">
+          <h2>🏬 Filiais — clientes compraram produtos da campanha, clientes com app e CUPONS VENDAS</h2>
+          <div class="store-filter-wrap">
+            <label for="storeFilter">Filial</label>
+            <div class="store-filter-controls">
+              <select id="storeFilter" class="store-filter-select">
+                <option value="">Todas as lojas</option>
+              </select>
+              <button type="button" id="clearStoreFilter" class="store-filter-clear">Limpar</button>
+            </div>
+          </div>
         </div>
 
         <div class="table-scroll">
@@ -255,7 +263,6 @@
                 <th>Clientes compraram produtos da campanha</th>
                 <th>Clientes com app</th>
                 <th>CUPONS VENDAS</th>
-                <th>Resumo produto</th>
               </tr>
             </thead>
             <tbody id="storesTableBody"></tbody>
@@ -344,8 +351,8 @@
       <!-- ===================== ETAPAS GAMIFICAÇÃO ===================== -->
       <section class="page-section" id="etapas-gamificacao">
         <div class="section-page-header">
-          <h2><i class="fas fa-users-gear"></i> Resultado da Gamificação</h2>
-          <p>Visão das etapas da gamificação e avanço do funil do jogo</p>
+          <h2><i class="fas fa-users-gear"></i> Operacional CRM</h2>
+          <p>Visão da gamificação e avanço do funil do jogo</p>
         </div>
 
         <div class="kpi-row">
@@ -382,7 +389,7 @@
           <div class="chart-card chart-card-wide">
             <div class="chart-header">
               <h3><i class="fas fa-chart-column"></i> Funil da gamificação</h3>
-              <p class="chart-sub">Etapas acumuladas da jornada na gamificação</p>
+              <p class="chart-sub">Etapas acumuladas da jornada no CRM</p>
             </div>
             <div class="chart-body" style="height:250px">
               <canvas id="chartGamificacaoDiario"></canvas>
@@ -391,7 +398,7 @@
 
           <div class="chart-card chart-card-narrow">
             <div class="chart-header">
-              <h3><i class="fas fa-circle-half-stroke"></i> Sucesso da etapa</h3>
+              <h3><i class="fas fa-circle-half-stroke"></i> Scan success</h3>
             </div>
             <div class="chart-body chart-center-body" style="height:220px">
               <canvas id="chartGamificacaoFunil"></canvas>
@@ -400,7 +407,7 @@
         </div>
 
         <div class="section-title-bar" style="margin-top:2rem">
-          <h2>📅 Resultado da Gamificação</h2>
+          <h2>📅 Etapas Gameficação </h2>
         </div>
 
         <div class="table-scroll">
@@ -411,42 +418,6 @@
                 <th>Clientes</th>
                 <th>% etapa anterior</th>
                 <th>% do scan</th>
-              </tr>
-            </thead>
-            <tbody id="gamificacaoDayTableBody"></tbody>
-          </table>
-        </div>
-
-        <div class="section-title-bar" style="margin-top:2rem">
-          <h2>🥇 Ranking de Produto da Gamificação</h2>
-        </div>
-
-        <div class="table-scroll" style="margin-top:0.85rem">
-          <table class="rank-table" id="gamificacaoProdutoRankingTable">
-            <thead>
-              <tr>
-                <th>Produto</th>
-                <th>Imagem</th>
-                <th>Qtde</th>
-                <th>% do total</th>
-              </tr>
-            </thead>
-            <tbody id="gamificacaoProdutoRankingBody"></tbody>
-          </table>
-        </div>
-
-        <div class="section-title-bar" style="margin-top:2rem">
-          <h2>🏬 Resultado Gamificação por Loja</h2>
-        </div>
-
-        <div class="table-scroll" style="margin-top:0.85rem">
-          <table class="rank-table" id="gamificacaoLojaTable">
-            <thead>
-              <tr>
-                <th>Loja</th>
-                <th>Qtde por loja</th>
-                <th>% do total</th>
-                <th>Ações</th>
               </tr>
             </thead>
             <tbody id="gamificacaoLojaTableBody"></tbody>
@@ -477,7 +448,7 @@
     </div>
   </div>
 
-  <script src="js/data.js?v=20260325-gamificacao-loja-accordion"></script>
-  <script src="js/app.js?v=20260325-gamificacao-loja-accordion"></script>
+  <script src="js/data.js?v=20260325-data-fix"></script>
+  <script src="js/app.js?v=20260325-data-fix"></script>
 </body>
 </html>
