@@ -59,6 +59,14 @@ function destroyChart(id) {
   }
 }
 
+function hydrateCountersFromDataCount() {
+  document.querySelectorAll('.kpi-value[data-count]').forEach(el => {
+    const target = parseInt(el.dataset.count, 10);
+    if (Number.isNaN(target)) return;
+    el.textContent = fmt(target);
+  });
+}
+
 function animateCounters() {
   document.querySelectorAll('.kpi-value[data-count]').forEach(el => {
     const target = parseInt(el.dataset.count, 10);
@@ -125,25 +133,27 @@ function initNav() {
 }
 
 function renderSection(id) {
-  switch (id) {
-    case 'visao-geral':
-      renderVisaoGeral();
-      break;
-    case 'visao-operacional':
-      renderVisaoOperacional();
-      break;
-    case 'ranking':
-      renderRanking();
-      break;
-    case 'produtos-campanha':
-      renderProdutosCampanha();
-      break;
-    case 'operacional-crm':
-      renderCRM();
-      break;
+  try {
+    switch (id) {
+      case 'visao-geral':
+        renderVisaoGeral();
+        break;
+      case 'visao-operacional':
+        renderVisaoOperacional();
+        break;
+      case 'ranking':
+        renderRanking();
+        break;
+      case 'produtos-campanha':
+        renderProdutosCampanha();
+        break;
+      case 'etapas-gamificacao':
+        renderEtapasGamificacao();
+        break;
+    }
+  } finally {
+    setTimeout(animateCounters, 100);
   }
-
-  setTimeout(animateCounters, 100);
 }
 
 /**
@@ -900,7 +910,7 @@ function buildProdTable(data) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  OPERACIONAL CRM
+//  ETAPAS GAMIFICAÇÃO
 // ═══════════════════════════════════════════════════════════════
 function renderCRM() {
   buildCRMLine();
@@ -910,9 +920,9 @@ function renderCRM() {
   buildCRMInsights();
 }
 
-function buildCRMLine() {
-  destroyChart('chartCRMDiario');
-  const ctx = document.getElementById('chartCRMDiario');
+function buildEtapasGamificacaoLine() {
+  destroyChart('chartGamificacaoDiario');
+  const ctx = document.getElementById('chartGamificacaoDiario');
   if (!ctx) return;
 
   chartInstances.chartCRMDiario = new Chart(ctx, {
@@ -955,9 +965,9 @@ function buildCRMLine() {
   });
 }
 
-function buildCRMFunnel() {
-  destroyChart('chartCRMFunil');
-  const ctx = document.getElementById('chartCRMFunil');
+function buildEtapasGamificacaoFunnel() {
+  destroyChart('chartGamificacaoFunil');
+  const ctx = document.getElementById('chartGamificacaoFunil');
   if (!ctx) return;
 
   const value = TOTAIS.gamificacaoEscaneou;
@@ -995,8 +1005,8 @@ function buildCRMFunnel() {
   });
 }
 
-function buildCRMDayTable() {
-  const tbody = document.getElementById('crmDayTableBody');
+function buildEtapasGamificacaoDayTable() {
+  const tbody = document.getElementById('gamificacaoDayTableBody');
   if (!tbody) return;
 
   const rows = [
@@ -1164,9 +1174,7 @@ function buildGamificacaoLojaTable() {
   });
 }
 
-function buildCRMInsights() {
-  const container = document.getElementById('crmInsights');
-  if (!container) return;
+function buildEtapasGamificacaoInsights() {
 
   const pctAbriuScan = (TOTAIS.gamificacaoAbriuScan / TOTAIS.gamificacaoAbriuJogo) * 100;
   const pctEscaneou = (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100;
@@ -1210,6 +1218,7 @@ function buildCRMInsights() {
 document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initNav();
+  hydrateCountersFromDataCount();
   renderVisaoGeral();
   animateCounters();
 });
