@@ -3,6 +3,14 @@
 //  Versão TV: Dentro e Fora no mesmo gráfico, sem botões
 // ============================================================
 
+if (typeof globalThis.Chart === 'undefined') {
+  const FallbackChart = function FallbackChart() {
+    return { destroy() {} };
+  };
+  FallbackChart.defaults = { font: {}, color: '#888' };
+  globalThis.Chart = FallbackChart;
+}
+
 Chart.defaults.font.family = "'Inter', sans-serif";
 Chart.defaults.color = '#888';
 
