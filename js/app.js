@@ -1,6 +1,6 @@
 // ============================================================
 //  DASHBOARD PÁSCOA — APP.JS
-//  Versão TV: Dentro e Fora no mesmo gráfico, sem botões
+//  Versão TV: leitura executiva de participantes, vendas app e vendas totais
 // ============================================================
 
 Chart.defaults.font.family = "'Inter', sans-serif";
@@ -9,6 +9,7 @@ Chart.defaults.color = '#888';
 let chartInstances = {};
 let rankMetric = 'itens';
 let currentSection = 'visao-geral';
+let selectedStore = '';
 
 function fmt(n) {
   if (typeof n !== 'number') return n;
@@ -27,6 +28,26 @@ function fmtPct(n, d = 1) {
     minimumFractionDigits: d,
     maximumFractionDigits: d
   }) + '%';
+}
+
+
+function getDonutCenterPlugin(text) {
+  return {
+    id: 'centerText',
+    afterDraw(chart) {
+      const { ctx, chartArea } = chart;
+      if (!chartArea) return;
+      const x = (chartArea.left + chartArea.right) / 2;
+      const y = (chartArea.top + chartArea.bottom) / 2;
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#7b3f1a';
+      ctx.font = '700 22px Inter';
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
+  };
 }
 
 function destroyChart(id) {
@@ -50,6 +71,33 @@ function animateCounters() {
       el.textContent = fmt(current);
       if (current >= target) clearInterval(timer);
     }, 16);
+  });
+}
+
+
+
+function initMobileMenu() {
+  const sidebar = document.getElementById('sidebar');
+  const button = document.getElementById('mobileMenuBtn');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (!sidebar || !button || !overlay) return;
+
+  const closeMenu = () => {
+    sidebar.classList.remove('mobile-open');
+    overlay.classList.remove('active');
+  };
+
+  button.addEventListener('click', () => {
+    const open = sidebar.classList.toggle('mobile-open');
+    overlay.classList.toggle('active', open);
+  });
+
+  overlay.addEventListener('click', closeMenu);
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 800) closeMenu();
+    });
   });
 }
 
@@ -88,8 +136,8 @@ function renderSection(id) {
     case 'produtos-campanha':
       renderProdutosCampanha();
       break;
-    case 'operacional-crm':
-      renderCRM();
+    case 'etapas-gamificacao':
+      renderEtapasGamificacao();
       break;
   }
 
@@ -97,9 +145,9 @@ function renderSection(id) {
 }
 
 /**
- * Série completa 01/03 a 17/03
- * - Antes de 13/03: Dentro = 0, Fora = Total do dia
- * - 13/03 em diante: Dentro e Fora conforme planilha
+ * Série completa 01/03 a 24/03
+ * - Antes de 13/03: participantes app = 0 e demais clientes = total do dia
+ * - 13/03 em diante: participantes app e não participantes conforme planilha
  */
 function getFullCampaignSeries() {
   const campaignMap = Object.fromEntries(
@@ -111,15 +159,13 @@ function getFullCampaignSeries() {
   return {
     labels,
 
-    dentroQtd: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Dentro.qtd ?? 0),
-    dentroTickets: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Dentro.tickets ?? 0),
-    dentroClientes: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Dentro.clientes ?? 0),
+    appVendas: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Dentro.qtd ?? 0),
+    appCupons: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Dentro.tickets ?? 0),
+    clientesApp: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Dentro.clientes ?? 0),
 
-    foraQtd: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Fora.qtd ?? d.qtd),
-    foraTickets: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Fora.tickets ?? d.cupons),
-    foraClientes: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Fora.clientes ?? d.clientes),
+    clientesNaoParticipantes: EVOLUCAO_DIARIA_GERAL.map(d => campaignMap[d.data]?.Fora.clientes ?? d.clientes),
 
-    totalQtd: EVOLUCAO_DIARIA_GERAL.map(d => d.qtd),
+    totalVendas: EVOLUCAO_DIARIA_GERAL.map(d => d.qtd),
     totalTickets: EVOLUCAO_DIARIA_GERAL.map(d => d.cupons),
     totalClientes: EVOLUCAO_DIARIA_GERAL.map(d => d.clientes)
   };
@@ -130,6 +176,7 @@ function getFullCampaignSeries() {
 // ═══════════════════════════════════════════════════════════════
 function renderVisaoGeral() {
   buildPodio();
+  buildStorePodio();
   buildChartEvolucaoGeral();
   buildDonutCampanha();
 }
@@ -155,8 +202,33 @@ function buildPodio() {
       <div class="podio-bar ${bars[i]}"></div>
       <div class="podio-info">
         <strong>${item.nome}</strong>
-        <span class="podio-qty">${fmt(item.itens)} itens</span>
-        <span class="podio-clients">${fmt(item.clientes)} clientes</span>
+        <span class="podio-qty">${fmt(item.itens)} vendas app</span>
+        <span class="podio-clients">${fmt(item.clientes)} compraram pelo app</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+
+function buildStorePodio() {
+  const grid = document.getElementById('storePodiumGrid');
+  if (!grid) return;
+
+  const medals = ['🥇', '🥈', '🥉'];
+  const bars = ['podio-bar-1', 'podio-bar-2', 'podio-bar-3'];
+
+  grid.innerHTML = PODIO_TOP3_LOJAS.map((item, i) => `
+    <div class="podio-item podio-${i + 1} store-podium-item">
+      <div class="podio-img-wrap store-badge-wrap ${i === 0 ? 'podio-img-crown' : ''}">
+        ${i === 0 ? '<div class="crown-icon">👑</div>' : ''}
+        <div class="store-podium-badge">${i + 1}º</div>
+      </div>
+      <div class="podio-medal">${medals[i]}</div>
+      <div class="podio-bar ${bars[i]}"></div>
+      <div class="podio-info">
+        <strong>${item.loja}</strong>
+        <span class="podio-qty">${fmt(item.cuponsVendas)} cupons vendas</span>
+        <span class="podio-clients">${fmt(item.clientesCampanha)} clientes da campanha</span>
       </div>
     </div>
   `).join('');
@@ -175,8 +247,8 @@ function buildChartEvolucaoGeral() {
       labels: series.labels,
       datasets: [
         {
-          label: 'Clientes — Dentro',
-          data: series.dentroClientes,
+          label: 'Compraram',
+          data: series.totalClientes,
           borderColor: PALETA.lilac,
           backgroundColor: PALETA.lilacBg,
           borderWidth: 3,
@@ -190,8 +262,8 @@ function buildChartEvolucaoGeral() {
           fill: false
         },
         {
-          label: 'Clientes — Fora',
-          data: series.foraClientes,
+          label: 'Compraram pelo app',
+          data: series.clientesApp,
           borderColor: PALETA.pink,
           backgroundColor: PALETA.pinkBg,
           borderWidth: 3,
@@ -205,14 +277,14 @@ function buildChartEvolucaoGeral() {
           fill: false
         },
         {
-          label: 'Qtd — Dentro',
-          data: series.dentroQtd,
-          borderColor: PALETA.mint,
-          backgroundColor: PALETA.mintBg,
+          label: 'Vendas totais',
+          data: series.totalVendas,
+          borderColor: PALETA.choco,
+          backgroundColor: PALETA.chocoBg,
           borderWidth: 2,
           pointRadius: 3,
           pointHoverRadius: 5,
-          pointBackgroundColor: PALETA.mint,
+          pointBackgroundColor: PALETA.choco,
           pointBorderColor: '#fff',
           pointBorderWidth: 2,
           cubicInterpolationMode: 'monotone',
@@ -221,8 +293,8 @@ function buildChartEvolucaoGeral() {
           fill: false
         },
         {
-          label: 'Qtd — Fora',
-          data: series.foraQtd,
+          label: 'Cupons na campanha',
+          data: series.appCupons,
           borderColor: PALETA.orange,
           backgroundColor: PALETA.orangeBg,
           borderWidth: 2,
@@ -282,35 +354,44 @@ function buildDonutCampanha() {
   if (!ctx) return;
 
   chartInstances.chartDonutClientes = new Chart(ctx, {
-    type: 'doughnut',
+    type: 'bar',
     data: {
-      labels: [
-        `Dentro (${fmt(TOTAIS.clientesDentro)})`,
-        `Fora (${fmt(TOTAIS.clientesForaBase)})`
-      ],
+      labels: ['Abriu o jogo', 'Abriu scan', 'Escaneou'],
       datasets: [{
-        data: [TOTAIS.clientesDentro, TOTAIS.clientesForaBase],
-        backgroundColor: [PALETA.lilac, '#f5ead8'],
-        borderColor: ['#fff', '#fff'],
-        borderWidth: 3,
-        hoverOffset: 8
+        label: 'Clientes',
+        data: [
+          TOTAIS.gamificacaoAbriuJogo,
+          TOTAIS.gamificacaoAbriuScan,
+          TOTAIS.gamificacaoEscaneou
+        ],
+        backgroundColor: [PALETA.lilacBg, PALETA.caramelBg, PALETA.orangeBg],
+        borderColor: [PALETA.lilac, PALETA.caramel, PALETA.orange],
+        borderWidth: 2,
+        borderRadius: 10,
+        borderSkipped: false
       }]
     },
     options: {
+      indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '68%',
       plugins: {
         legend: { display: false },
         tooltip: {
           backgroundColor: 'rgba(61,26,0,0.9)',
           callbacks: {
-            label: ctx => {
-              const total = TOTAIS.clientesDentro + TOTAIS.clientesForaBase;
-              const pct = (ctx.parsed / total) * 100;
-              return ` ${fmt(ctx.parsed)} clientes (${fmtPct(pct, 1)})`;
-            }
+            label: ctx => ` ${fmt(ctx.parsed.x)} clientes`
           }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(0,0,0,0.04)' },
+          ticks: { callback: value => fmt(value) }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { font: { size: 11, weight: '600' } }
         }
       }
     }
@@ -320,11 +401,82 @@ function buildDonutCampanha() {
 // ═══════════════════════════════════════════════════════════════
 //  VISÃO OPERACIONAL
 // ═══════════════════════════════════════════════════════════════
+
+function getOperationalPeriodTotals() {
+  return EVOLUCAO_DIARIA_CAMPANHA.reduce((acc, day) => ({
+    vendasApp: acc.vendasApp + day.Dentro.qtd,
+    appCupons: acc.appCupons + day.Dentro.tickets,
+    clientesParticipantes: acc.clientesParticipantes + day.Dentro.clientes,
+    vendasTotais: acc.vendasTotais + day.Total.qtd,
+    cuponsTotais: acc.cuponsTotais + day.Total.tickets,
+    clientesTotais: acc.clientesTotais + day.Total.clientes,
+    clientesSemApp: acc.clientesSemApp + day.Fora.clientes
+  }), {
+    vendasApp: 0,
+    appCupons: 0,
+    clientesParticipantes: 0,
+    vendasTotais: 0,
+    cuponsTotais: 0,
+    clientesTotais: 0,
+    clientesSemApp: 0
+  });
+}
+
 function renderVisaoOperacional() {
+  buildOperationalTotalizers();
   buildChartOperacional();
   buildDonutParticipacao();
+  initStoreFilter();
   buildDailyCampaignTable();
   buildStoresTable();
+}
+
+
+function buildOperationalTotalizers() {
+  const container = document.getElementById('operationalTotalizers');
+  if (!container) return;
+
+  const cards = [
+    {
+      cls: 'kpi-purple',
+      icon: 'fa-users',
+      label: 'Clientes compraram produtos da campanha',
+      value: fmt(TOTAIS.clientesCompraramCampanha),
+      sub: 'total de clientes da campanha'
+    },
+    {
+      cls: 'kpi-green',
+      icon: 'fa-mobile-screen-button',
+      label: 'Clientes com app',
+      value: fmt(TOTAIS.clientesComAppInstalado),
+      sub: 'base com app identificado'
+    },
+    {
+      cls: 'kpi-orange',
+      icon: 'fa-receipt',
+      label: 'CUPONS VENDAS',
+      value: fmt(TOTAIS.cuponsVendasCampanha),
+      sub: 'volume total de vendas da campanha'
+    },
+    {
+      cls: 'kpi-pink',
+      icon: 'fa-store',
+      label: 'Total de lojas ativas na campanha',
+      value: fmt(TOTAIS.lojasParticipantes),
+      sub: 'lojas ativas no período'
+    }
+  ];
+
+  container.innerHTML = cards.map(card => `
+    <div class="kpi-card ${card.cls}">
+      <div class="kpi-icon"><i class="fas ${card.icon}"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-label">${card.label}</span>
+        <span class="kpi-value">${card.value}</span>
+        <span class="kpi-sub">${card.sub}</span>
+      </div>
+    </div>
+  `).join('');
 }
 
 function buildChartOperacional() {
@@ -340,8 +492,8 @@ function buildChartOperacional() {
       labels: series.labels,
       datasets: [
         {
-          label: 'Clientes — Dentro',
-          data: series.dentroClientes,
+          label: 'Compraram',
+          data: series.totalClientes,
           borderColor: PALETA.lilac,
           backgroundColor: PALETA.lilacBg,
           borderWidth: 3,
@@ -354,8 +506,8 @@ function buildChartOperacional() {
           fill: false
         },
         {
-          label: 'Clientes — Fora',
-          data: series.foraClientes,
+          label: 'Compraram pelo app',
+          data: series.clientesApp,
           borderColor: PALETA.pink,
           backgroundColor: PALETA.pinkBg,
           borderWidth: 3,
@@ -368,13 +520,13 @@ function buildChartOperacional() {
           fill: false
         },
         {
-          label: 'Qtd — Dentro',
-          data: series.dentroQtd,
-          borderColor: PALETA.mint,
-          backgroundColor: PALETA.mintBg,
+          label: 'Vendas totais',
+          data: series.totalVendas,
+          borderColor: PALETA.choco,
+          backgroundColor: PALETA.chocoBg,
           borderWidth: 2,
           pointRadius: 3,
-          pointBackgroundColor: PALETA.mint,
+          pointBackgroundColor: PALETA.choco,
           pointBorderColor: '#fff',
           pointBorderWidth: 2,
           cubicInterpolationMode: 'monotone',
@@ -383,8 +535,8 @@ function buildChartOperacional() {
           fill: false
         },
         {
-          label: 'Qtd — Fora',
-          data: series.foraQtd,
+          label: 'Cupons na campanha',
+          data: series.appCupons,
           borderColor: PALETA.orange,
           backgroundColor: PALETA.orangeBg,
           borderWidth: 2,
@@ -434,17 +586,24 @@ function buildDonutParticipacao() {
   const legend = document.getElementById('operacionalLegend');
   if (!ctx || !legend) return;
 
-  const value = TOTAIS.clientesDentro;
-  const remainder = TOTAIS.clientesForaBase;
-  const pct = (value / TOTAIS.clientesTotalBase) * 100;
+  const periodTotals = getOperationalPeriodTotals();
+  const value = selectedStore
+    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore).reduce((sum, row) => sum + row.clientesComApp, 0)
+    : TOTAIS.clientesComAppInstalado;
+  const remainder = selectedStore
+    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore).reduce((sum, row) => sum + row.clientesSemApp, 0)
+    : (TOTAIS.clientesCompraramCampanha - TOTAIS.clientesComAppInstalado);
+  const total = value + remainder;
+  const pct = total > 0 ? (value / total) * 100 : 0;
 
   chartInstances.chartOpParticipacao = new Chart(ctx, {
     type: 'doughnut',
+    plugins: [getDonutCenterPlugin(fmtPct(pct, 1))],
     data: {
-      labels: ['Dentro', 'Fora'],
+      labels: ['Compraram pelo app', 'Clientes sem app'],
       datasets: [{
         data: [value, remainder],
-        backgroundColor: [PALETA.lilac, '#f5ead8'],
+        backgroundColor: [PALETA.cream, PALETA.lilac],
         borderColor: ['#fff', '#fff'],
         borderWidth: 3,
         hoverOffset: 8
@@ -459,7 +618,7 @@ function buildDonutParticipacao() {
         tooltip: {
           backgroundColor: 'rgba(61,26,0,0.9)',
           callbacks: {
-            label: ctx => ` ${fmt(ctx.parsed)} clientes`
+            label: ctx => ` ${fmt(ctx.parsed)} clientes (${fmtPct((ctx.parsed / total) * 100, 1)})`
           }
         }
       }
@@ -467,8 +626,8 @@ function buildDonutParticipacao() {
   });
 
   legend.innerHTML = `
-    <span class="dot dot-purple"></span><span>Dentro <strong>${fmtPct(pct, 1)}</strong></span>
-    <span class="dot dot-cream"></span><span>Fora <strong>${fmtPct(100 - pct, 1)}</strong></span>
+    <span class="dot dot-purple"></span><span>Compraram pelo app <strong>${fmt(value)}</strong></span>
+    <span class="dot dot-cream"></span><span>Clientes sem app <strong>${fmt(remainder)}</strong></span>
   `;
 }
 
@@ -476,35 +635,86 @@ function buildDailyCampaignTable() {
   const tbody = document.getElementById('dailyCampaignTableBody');
   if (!tbody) return;
 
+  const totalTickets = EVOLUCAO_DIARIA_CAMPANHA.reduce((sum, d) => sum + d.Total.tickets, 0);
+  const totalClientes = EVOLUCAO_DIARIA_CAMPANHA.reduce((sum, d) => sum + d.Total.clientes, 0);
+
   tbody.innerHTML = EVOLUCAO_DIARIA_CAMPANHA.map(d => `
     <tr>
       <td><strong>${d.data}</strong></td>
-      <td>${fmt(d.Dentro.qtd)}</td>
-      <td>${fmt(d.Dentro.tickets)}</td>
-      <td>${fmt(d.Dentro.clientes)}</td>
-      <td>${fmt(d.Fora.qtd)}</td>
-      <td>${fmt(d.Fora.tickets)}</td>
-      <td>${fmt(d.Fora.clientes)}</td>
-      <td><strong>${fmt(d.Total.qtd)}</strong></td>
-      <td><strong>${fmt(d.Total.tickets)}</strong></td>
-      <td><strong>${fmt(d.Total.clientes)}</strong></td>
+      <td>${fmt(d.Total.tickets)}</td>
+      <td>${fmt(d.Total.clientes)}</td>
     </tr>
-  `).join('');
+  `).join('') + `
+    <tr class="table-total-row">
+      <td><strong>Total</strong></td>
+      <td><strong>${fmt(totalTickets)}</strong></td>
+      <td><strong>${fmt(totalClientes)}</strong></td>
+    </tr>
+  `;
+}
+
+function initStoreFilter() {
+  const select = document.getElementById('storeFilter');
+  const clearButton = document.getElementById('clearStoreFilter');
+  if (!select) return;
+
+  const options = ['<option value="">Todas as lojas</option>']
+    .concat(LOJAS_OPERACIONAL.map(row => `<option value="${row.loja}">${row.loja}</option>`));
+
+  select.innerHTML = options.join('');
+  select.value = selectedStore;
+  select.onchange = () => {
+    selectedStore = select.value;
+    buildOperationalTotalizers();
+    buildDonutParticipacao();
+    buildStoresTable();
+  };
+
+  if (clearButton) {
+    clearButton.onclick = () => {
+      selectedStore = '';
+      select.value = '';
+      buildOperationalTotalizers();
+      buildDonutParticipacao();
+      buildStoresTable();
+    };
+  }
 }
 
 function buildStoresTable() {
   const tbody = document.getElementById('storesTableBody');
   if (!tbody) return;
 
-  tbody.innerHTML = RANKING_LOJAS_DENTRO.map((row, i) => `
+  const filteredRows = selectedStore
+    ? LOJAS_OPERACIONAL.filter(row => row.loja === selectedStore)
+    : LOJAS_OPERACIONAL;
+
+  const totals = filteredRows.reduce((acc, row) => ({
+    clientesCampanha: acc.clientesCampanha + row.clientesCampanha,
+    clientesComApp: acc.clientesComApp + row.clientesComApp,
+    cuponsVendas: acc.cuponsVendas + row.cuponsVendas
+  }), {
+    clientesCampanha: 0,
+    clientesComApp: 0,
+    cuponsVendas: 0
+  });
+
+  tbody.innerHTML = filteredRows.map((row, i) => `
     <tr>
       <td class="rank-num">${i + 1}</td>
       <td><strong>${row.loja}</strong></td>
-      <td>${fmt(row.qtd)}</td>
-      <td>${fmt(row.tickets)}</td>
-      <td>${fmt(row.clientes)}</td>
+      <td>${fmt(row.clientesCampanha)}</td>
+      <td>${fmt(row.clientesComApp)}</td>
+      <td>${fmt(row.cuponsVendas)}</td>
     </tr>
-  `).join('');
+  `).join('') + `
+    <tr class="table-total-row">
+      <td colspan="2"><strong>${selectedStore ? 'Total da filial' : 'Total consolidado'}</strong></td>
+      <td><strong>${fmt(totals.clientesCampanha)}</strong></td>
+      <td><strong>${fmt(totals.clientesComApp)}</strong></td>
+      <td><strong>${fmt(totals.cuponsVendas)}</strong></td>
+    </tr>
+  `;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -536,9 +746,9 @@ function buildRankingChart(metric) {
 
   const colors = [
     PALETA.lilac, PALETA.pink, PALETA.orange, PALETA.caramel,
-    PALETA.mint, PALETA.choco,
+    PALETA.orange, PALETA.choco,
     'rgba(232,160,32,0.6)', 'rgba(211,84,0,0.6)', 'rgba(230,126,34,0.6)',
-    'rgba(39,174,96,0.5)', 'rgba(123,63,26,0.5)', 'rgba(232,160,32,0.4)',
+    'rgba(156,90,26,0.35)', 'rgba(123,63,26,0.5)', 'rgba(232,160,32,0.4)',
     'rgba(211,84,0,0.4)'
   ];
 
@@ -547,7 +757,7 @@ function buildRankingChart(metric) {
     data: {
       labels,
       datasets: [{
-        label: metric === 'itens' ? 'Quantidade Vendida' : 'Clientes Únicos',
+        label: metric === 'itens' ? 'Vendas app' : 'Compraram pelo app',
         data: values,
         backgroundColor: colors.slice(0, values.length),
         borderRadius: 8,
@@ -657,7 +867,7 @@ function buildProductsGrid(data) {
       </div>
 
       <span class="pc-status ${p.soldDentro ? 'active' : 'inactive'}">
-        ${p.soldDentro ? `✓ ${fmt(p.itens)} itens na campanha` : 'Sem venda dentro'}
+        ${p.soldDentro ? `✓ ${fmt(p.itens)} vendas app` : 'Sem vendas app'}
       </span>
     </div>
   `).join('');
@@ -672,7 +882,7 @@ function buildProdTable(data) {
       <td><code style="font-size:0.78rem;color:var(--choco-light)">${p.id}</code></td>
       <td><strong>${p.name}</strong></td>
       <td>R$ ${fmtR(p.priceOriginal)}</td>
-      <td style="color:var(--mint);font-weight:700">R$ ${fmtR(p.priceOffer)}</td>
+      <td style="color:var(--orange);font-weight:700">R$ ${fmtR(p.priceOffer)}</td>
       <td>
         <span style="background:var(--pink-light);color:var(--pink);padding:2px 8px;border-radius:10px;font-weight:700;font-size:0.78rem">
           -${p.discount}%
@@ -680,7 +890,7 @@ function buildProdTable(data) {
       </td>
       <td>
         <span class="${p.soldDentro ? 'badge-within' : 'badge-outside'}">
-          ${p.soldDentro ? `✓ ${fmt(p.itens)} itens` : 'Sem venda dentro'}
+          ${p.soldDentro ? `✓ ${fmt(p.itens)} vendas app` : 'Sem vendas app'}
         </span>
       </td>
     </tr>
@@ -688,108 +898,37 @@ function buildProdTable(data) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  OPERACIONAL CRM
+//  ETAPAS GAMIFICAÇÃO
 // ═══════════════════════════════════════════════════════════════
-function renderCRM() {
-  buildCRMLine();
-  buildCRMFunnel();
-  buildCRMDayTable();
-  buildCRMInsights();
+function renderEtapasGamificacao() {
+  buildEtapasGamificacaoLine();
+  buildEtapasGamificacaoFunnel();
+  buildEtapasGamificacaoDayTable();
+  buildGamificacaoProdutoRankingTable();
+  buildGamificacaoLojaTable();
+  buildEtapasGamificacaoInsights();
 }
 
-function buildCRMLine() {
-  destroyChart('chartCRMDiario');
-  const ctx = document.getElementById('chartCRMDiario');
+function buildEtapasGamificacaoLine() {
+  destroyChart('chartGamificacaoDiario');
+  const ctx = document.getElementById('chartGamificacaoDiario');
   if (!ctx) return;
 
-  chartInstances.chartCRMDiario = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: EVOLUCAO_DIARIA_GERAL.map(d => d.data),
-      datasets: [
-        {
-          label: 'Clientes Totais',
-          data: EVOLUCAO_DIARIA_GERAL.map(d => d.clientes),
-          borderColor: PALETA.lilac,
-          backgroundColor: PALETA.lilacBg,
-          borderWidth: 3,
-          pointRadius: 4,
-          pointBackgroundColor: PALETA.lilac,
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
-          cubicInterpolationMode: 'monotone',
-          tension: 0.45,
-          fill: true
-        },
-        {
-          label: 'Cupons Totais',
-          data: EVOLUCAO_DIARIA_GERAL.map(d => d.cupons),
-          borderColor: PALETA.caramel,
-          backgroundColor: PALETA.caramelBg,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointBackgroundColor: PALETA.caramel,
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
-          cubicInterpolationMode: 'monotone',
-          tension: 0.45,
-          fill: false,
-          borderDash: [6, 4]
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: {
-          position: 'top',
-          labels: {
-            usePointStyle: true,
-            padding: 14,
-            font: { size: 12 }
-          }
-        },
-        tooltip: {
-          backgroundColor: 'rgba(61,26,0,0.9)',
-          titleColor: '#fff',
-          bodyColor: '#f5ead8',
-          padding: 10,
-          cornerRadius: 10
-        }
-      },
-      scales: {
-        x: { grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false } },
-        y: {
-          grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
-          ticks: { callback: value => fmt(value) }
-        }
-      }
-    }
-  });
-}
-
-function buildCRMFunnel() {
-  destroyChart('chartCRMFunil');
-  const ctx = document.getElementById('chartCRMFunil');
-  if (!ctx) return;
-
-  chartInstances.chartCRMFunil = new Chart(ctx, {
+  chartInstances.chartGamificacaoDiario = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Base Total', 'Fora', 'Dentro'],
+      labels: ['Abriu o jogo', 'Abriu scan', 'Escaneou'],
       datasets: [{
         label: 'Clientes',
         data: [
-          TOTAIS.clientesTotalBase,
-          TOTAIS.clientesForaBase,
-          TOTAIS.clientesDentro
+          TOTAIS.gamificacaoAbriuJogo,
+          TOTAIS.gamificacaoAbriuScan,
+          TOTAIS.gamificacaoEscaneou
         ],
-        backgroundColor: [PALETA.caramelBg, '#f5ead8', PALETA.lilac],
-        borderColor: [PALETA.caramel, '#d9cdbd', PALETA.lilac],
+        backgroundColor: [PALETA.lilacBg, PALETA.caramelBg, PALETA.orangeBg],
+        borderColor: [PALETA.lilac, PALETA.caramel, PALETA.orange],
         borderWidth: 2,
-        borderRadius: 8,
+        borderRadius: 10,
         borderSkipped: false
       }]
     },
@@ -806,9 +945,48 @@ function buildCRMFunnel() {
       scales: {
         x: { grid: { display: false } },
         y: {
-          grid: { color: 'rgba(0,0,0,0.04)' },
-          ticks: {
-            callback: value => value >= 1000 ? `${Math.round(value / 1000)}k` : value
+          grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
+          beginAtZero: true,
+          ticks: { callback: value => fmt(value) }
+        }
+      }
+    }
+  });
+}
+
+function buildEtapasGamificacaoFunnel() {
+  destroyChart('chartGamificacaoFunil');
+  const ctx = document.getElementById('chartGamificacaoFunil');
+  if (!ctx) return;
+
+  const value = TOTAIS.gamificacaoEscaneou;
+  const remainder = TOTAIS.gamificacaoAbriuScan - TOTAIS.gamificacaoEscaneou;
+  const total = TOTAIS.gamificacaoAbriuScan;
+  const pct = total > 0 ? (value / total) * 100 : 0;
+
+  chartInstances.chartGamificacaoFunil = new Chart(ctx, {
+    type: 'doughnut',
+    plugins: [getDonutCenterPlugin(fmtPct(pct, 1))],
+    data: {
+      labels: ['Escaneou', 'Não escaneou'],
+      datasets: [{
+        data: [value, remainder],
+        backgroundColor: [PALETA.cream, PALETA.lilac],
+        borderColor: ['#fff', '#fff'],
+        borderWidth: 3,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(61,26,0,0.9)',
+          callbacks: {
+            label: ctx => ` ${fmt(ctx.parsed)} clientes (${fmtPct((ctx.parsed / total) * 100, 1)})`
           }
         }
       }
@@ -816,94 +994,166 @@ function buildCRMFunnel() {
   });
 }
 
-function buildCRMDayTable() {
-  const tbody = document.getElementById('crmDayTableBody');
+function buildEtapasGamificacaoDayTable() {
+  const tbody = document.getElementById('gamificacaoDayTableBody');
   if (!tbody) return;
 
-  const dailyMap = Object.fromEntries(
-    EVOLUCAO_DIARIA_CAMPANHA.map(d => [d.data, d])
-  );
+  const rows = [
+    {
+      etapa: 'Abriu scan',
+      clientes: TOTAIS.gamificacaoAbriuScan,
+      pctEtapa: 100,
+      pctBase: 100
+    },
+    {
+      etapa: 'Escaneou',
+      clientes: TOTAIS.gamificacaoEscaneou,
+      pctEtapa: (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100,
+      pctBase: (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100
+    },
+    {
+      etapa: 'CPFs que compraram',
+      clientes: TOTAIS.gamificacaoCompletou,
+      pctEtapa: (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoEscaneou) * 100,
+      pctBase: (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoAbriuScan) * 100
+    },
+  ];
 
-  tbody.innerHTML = EVOLUCAO_DIARIA_GERAL.map(d => {
-    const campanha = dailyMap[d.data];
-    const dentro = campanha ? campanha.Dentro.clientes : 0;
-    const fora = campanha ? campanha.Fora.clientes : d.clientes;
-    const pct = d.clientes > 0 ? (dentro / d.clientes) * 100 : 0;
+  tbody.innerHTML = rows.map(row => `
+    <tr>
+      <td><strong>${row.etapa}</strong></td>
+      <td>${fmt(row.clientes)}</td>
+      <td>${fmtPct(row.pctEtapa, 1)}</td>
+      <td>${fmtPct(row.pctBase, 1)}</td>
+    </tr>
+  `).join('');
+}
+
+
+function getGamificacaoProductImage(produtoNome) {
+  const normalize = value => (value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const target = normalize(produtoNome);
+
+  const match = PRODUTOS_CAMPANHA.find(item => {
+    const name = normalize(item.name);
+    const shortName = normalize(item.shortName);
+    return name.includes(target) || target.includes(name) || shortName.includes(target) || target.includes(shortName);
+  });
+
+  return match?.img || null;
+}
+
+function buildGamificacaoProdutoRankingTable() {
+  const tbody = document.getElementById('gamificacaoProdutoRankingBody');
+  if (!tbody) return;
+
+  const total = RANKING_PRODUTOS_GAMIFICACAO.reduce((acc, row) => acc + row.qtd, 0);
+
+  tbody.innerHTML = RANKING_PRODUTOS_GAMIFICACAO
+    .sort((a, b) => b.qtd - a.qtd || a.produto.localeCompare(b.produto, 'pt-BR'))
+    .map(row => {
+      const img = getGamificacaoProductImage(row.produto);
+      return `
+        <tr>
+          <td><strong>${row.produto}</strong></td>
+          <td>${img ? `<img src="${img}" alt="${row.produto}" class="rank-product-thumb"/>` : '<span style="opacity:.55">—</span>'}</td>
+          <td>${fmt(row.qtd)}</td>
+          <td>${fmtPct((row.qtd / total) * 100, 1)}</td>
+        </tr>
+      `;
+    }).join('');
+}
+
+function buildGamificacaoLojaTable() {
+  const tbody = document.getElementById('gamificacaoLojaTableBody');
+  const resumo = document.getElementById('gamificacaoLojaResumo');
+  if (!tbody || !resumo) return;
+
+  const totalGeral = RESULTADO_GAMIFICACAO_LOJA.reduce((acc, row) => acc + row.total, 0);
+  const lojas = [...RESULTADO_GAMIFICACAO_LOJA].sort((a, b) => b.total - a.total || a.loja.localeCompare(b.loja, 'pt-BR'));
+
+  tbody.innerHTML = lojas.map((row, idx) => {
+    const topProd = [...row.produtos].sort((a, b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'))[0];
+    const produtosRows = [...row.produtos]
+      .sort((a, b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'))
+      .map(prod => `<tr><td>${prod.nome}</td><td>${fmt(prod.qtd)}</td><td>${fmtPct((prod.qtd / row.total) * 100, 1)}</td></tr>`)
+      .join('');
 
     return `
-      <tr>
-        <td><strong>${d.data}</strong></td>
-        <td>${fmt(d.clientes)}</td>
-        <td style="color:var(--caramel);font-weight:700">${fmt(dentro)}</td>
-        <td>${fmt(fora)}</td>
-        <td>
-          ${
-            dentro > 0
-              ? `<span style="background:var(--lilac);color:#fff;padding:2px 8px;border-radius:10px;font-size:0.76rem;font-weight:700">${fmtPct(pct, 1)}</span>`
-              : '<span style="color:#ccc;font-size:0.76rem">0,0%</span>'
-          }
+      <tr class="row-loja-accordion" data-target="loja-${idx}" style="cursor:pointer">
+        <td><strong>${row.loja}</strong></td>
+        <td>${fmt(row.total)}</td>
+        <td>${fmtPct((row.total / totalGeral) * 100, 1)}</td>
+        <td>${topProd ? `Top: ${topProd.nome} (${fmt(topProd.qtd)})` : 'Sem produtos'} • Clique para expandir</td>
+      </tr>
+      <tr id="loja-${idx}" class="row-loja-details" style="display:none">
+        <td colspan="4">
+          <table class="rank-table" style="margin:0">
+            <thead>
+              <tr><th>Produto</th><th>Qtde</th><th>% na loja</th></tr>
+            </thead>
+            <tbody>${produtosRows}</tbody>
+          </table>
         </td>
       </tr>
     `;
   }).join('');
+
+  const amanditaTop = RESULTADO_GAMIFICACAO_LOJA
+    .map(row => ({ loja: row.loja, qtd: row.produtos.find(p => p.nome === 'Amandita Lacta Choc.200g')?.qtd || 0 }))
+    .sort((a, b) => b.qtd - a.qtd)[0];
+
+  resumo.textContent = amanditaTop && amanditaTop.qtd > 0
+    ? `Resumo direto: loja que mais vendeu Amandita Lacta Choc.200g foi ${amanditaTop.loja} (${fmt(amanditaTop.qtd)} unidades). Total geral: ${fmt(totalGeral)}.`
+    : `Resumo direto: Total geral da base de lojas é ${fmt(totalGeral)} itens.`;
+
+  tbody.querySelectorAll('.row-loja-accordion').forEach(row => {
+    row.addEventListener('click', () => {
+      const target = document.getElementById(row.dataset.target);
+      if (!target) return;
+      const open = target.style.display !== 'none';
+      tbody.querySelectorAll('.row-loja-details').forEach(r => { r.style.display = 'none'; });
+      target.style.display = open ? 'none' : 'table-row';
+    });
+  });
 }
 
-function buildCRMInsights() {
-  const container = document.getElementById('crmInsights');
+function buildEtapasGamificacaoInsights() {
+
+  const container = document.getElementById('gamificacaoInsights');
   if (!container) return;
 
-  const growth =
-    ((EVOLUCAO_DIARIA_CAMPANHA[1].Dentro.clientes - EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) /
-      EVOLUCAO_DIARIA_CAMPANHA[0].Dentro.clientes) * 100;
-
-  const topStore = RANKING_LOJAS_DENTRO[0];
-  const topProduct = RANKING_DENTRO[0];
+  const pctAbriuScan = (TOTAIS.gamificacaoAbriuScan / TOTAIS.gamificacaoAbriuJogo) * 100;
+  const pctEscaneou = (TOTAIS.gamificacaoEscaneou / TOTAIS.gamificacaoAbriuScan) * 100;
+  const pctCompraram = (TOTAIS.gamificacaoCompletou / TOTAIS.gamificacaoEscaneou) * 100;
 
   const insights = [
     {
-      icon: 'fas fa-arrow-trend-up',
-      type: 'good',
-      title: 'Crescimento forte entre 13/03 e 14/03',
-      text: `Clientes Dentro cresceram ${fmtPct(growth, 1)} no comparativo diário.`
-    },
-    {
-      icon: 'fas fa-percent',
+      icon: 'fas fa-mobile-screen-button',
       type: 'info',
-      title: 'Participação atual da campanha',
-      text: `A campanha representa ${fmtPct(TOTAIS.participacao, 2)} da base estimada de clientes.`
+      title: 'Volume de abertura de scan',
+      text: `${fmt(TOTAIS.gamificacaoAbriuScan)} clientes chegaram até a tela de scan na gamificação (${fmtPct(pctAbriuScan, 2)} de quem abriu o jogo).`
     },
     {
-      icon: 'fas fa-store',
+      icon: 'fas fa-qrcode',
       type: 'good',
-      title: 'Loja líder na campanha',
-      text: `${topStore.loja} lidera com ${fmt(topStore.qtd)} itens, ${fmt(topStore.tickets)} tickets e ${fmt(topStore.clientes)} clientes.`
+      title: 'Scan success muito alto',
+      text: `${fmtPct(pctEscaneou, 2)} de quem abriu scan conseguiu escanear.`
     },
     {
-      icon: 'fas fa-egg',
+      icon: 'fas fa-cart-shopping',
       type: 'warn',
-      title: 'Produto com maior tração',
-      text: `${topProduct.nome} lidera com ${fmt(topProduct.itens)} itens e ${fmt(topProduct.clientes)} clientes.`
+      title: 'Conversão em compra após scan',
+      text: `${fmtPct(pctCompraram, 2)} de quem escaneou avançou até CPFs que compraram.`
     },
-    {
-      icon: 'fas fa-box-open',
-      type: 'info',
-      title: 'Cobertura de itens da campanha',
-      text: `${fmt(TOTAIS.produtosDentro)} dos ${fmt(TOTAIS.produtosCampanha)} produtos já tiveram venda com status Dentro.`
-    },
-    {
-      icon: 'fas fa-users-slash',
-      type: 'alert',
-      title: 'Clientes fora da campanha',
-      text: `Ainda existem ${fmt(TOTAIS.clientesForaBase)} clientes fora, o que mostra espaço para ampliar adesão.`
-    }
   ];
 
-  container.innerHTML = insights.map(ins => `
-    <div class="insight-card">
-      <div class="insight-icon ${ins.type}"><i class="${ins.icon}"></i></div>
-      <div class="insight-text">
-        <strong>${ins.title}</strong>
-        <p>${ins.text}</p>
+  container.innerHTML = insights.map(card => `
+    <div class="insight-card ${card.type}">
+      <div class="insight-icon"><i class="${card.icon}"></i></div>
+      <div>
+        <h4>${card.title}</h4>
+        <p>${card.text}</p>
       </div>
     </div>
   `).join('');
@@ -913,6 +1163,7 @@ function buildCRMInsights() {
 //  INIT
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
+  initMobileMenu();
   initNav();
   renderVisaoGeral();
   animateCounters();
